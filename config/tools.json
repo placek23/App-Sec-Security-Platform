@@ -1,0 +1,217 @@
+{
+  "platform": {
+    "name": "AppSec Bounty Platform",
+    "version": "1.0.0",
+    "description": "Streamlined app pen testing and bug bounty platform"
+  },
+  "output": {
+    "base_dir": "./output",
+    "formats": ["json", "txt", "html"],
+    "timestamp_files": true
+  },
+  "rate_limiting": {
+    "enabled": true,
+    "requests_per_second": 10,
+    "delay_between_tools": 2
+  },
+  "tools": {
+    "recon": {
+      "subfinder": {
+        "binary": "subfinder",
+        "description": "Fast passive subdomain discovery",
+        "default_args": ["-silent", "-all"],
+        "output_format": "txt",
+        "timeout": 300
+      },
+      "amass": {
+        "binary": "amass",
+        "description": "Advanced subdomain enumeration with OSINT",
+        "default_args": ["enum", "-passive"],
+        "output_format": "txt",
+        "timeout": 600
+      },
+      "httpx": {
+        "binary": "httpx",
+        "description": "HTTP probing and technology detection",
+        "default_args": ["-silent", "-status-code", "-title", "-tech-detect"],
+        "output_format": "json",
+        "timeout": 300
+      },
+      "katana": {
+        "binary": "katana",
+        "description": "JS-aware web crawling and endpoint discovery",
+        "default_args": ["-silent", "-jc", "-kf", "all"],
+        "output_format": "txt",
+        "timeout": 600
+      },
+      "gau": {
+        "binary": "gau",
+        "description": "Get All URLs from Wayback, Common Crawl, etc.",
+        "default_args": ["--threads", "5"],
+        "output_format": "txt",
+        "timeout": 300
+      }
+    },
+    "discovery": {
+      "ffuf": {
+        "binary": "ffuf",
+        "description": "Fast web fuzzer for dirs, files, params",
+        "default_args": ["-c", "-ac", "-t", "50"],
+        "output_format": "json",
+        "timeout": 600,
+        "wordlists": {
+          "directories": "/usr/share/wordlists/dirb/common.txt",
+          "files": "/usr/share/wordlists/dirb/extensions_common.txt",
+          "params": "/usr/share/wordlists/params.txt"
+        }
+      },
+      "feroxbuster": {
+        "binary": "feroxbuster",
+        "description": "Recursive content discovery",
+        "default_args": ["-q", "--auto-tune", "-t", "50"],
+        "output_format": "json",
+        "timeout": 900
+      },
+      "arjun": {
+        "binary": "arjun",
+        "description": "HTTP parameter discovery",
+        "default_args": ["-t", "10"],
+        "output_format": "json",
+        "timeout": 300
+      },
+      "paramspider": {
+        "binary": "paramspider",
+        "description": "Parameter mining from web archives",
+        "default_args": ["--level", "high"],
+        "output_format": "txt",
+        "timeout": 300
+      }
+    },
+    "scanning": {
+      "nuclei": {
+        "binary": "nuclei",
+        "description": "Template-based vulnerability scanner",
+        "default_args": ["-silent", "-severity", "low,medium,high,critical"],
+        "output_format": "json",
+        "timeout": 1800,
+        "templates": {
+          "default": ["cves", "vulnerabilities", "exposures", "misconfiguration"],
+          "web_only": ["cves", "vulnerabilities", "exposures"],
+          "quick": ["critical", "high"]
+        }
+      },
+      "wafw00f": {
+        "binary": "wafw00f",
+        "description": "Web Application Firewall detection",
+        "default_args": ["-a"],
+        "output_format": "json",
+        "timeout": 60
+      },
+      "whatweb": {
+        "binary": "whatweb",
+        "description": "Web technology fingerprinting",
+        "default_args": ["-a", "3", "--color=never"],
+        "output_format": "json",
+        "timeout": 120
+      }
+    },
+    "injection": {
+      "sqlmap": {
+        "binary": "sqlmap",
+        "description": "Automated SQL injection testing",
+        "default_args": ["--batch", "--random-agent", "--level", "2", "--risk", "2"],
+        "output_format": "txt",
+        "timeout": 600,
+        "safe_options": {
+          "safe_url": true,
+          "safe_freq": 3
+        }
+      },
+      "dalfox": {
+        "binary": "dalfox",
+        "description": "Advanced XSS scanner with DOM analysis",
+        "default_args": ["--silence", "--no-color", "-w", "50"],
+        "output_format": "json",
+        "timeout": 300
+      },
+      "commix": {
+        "binary": "commix",
+        "description": "Command injection exploitation tool",
+        "default_args": ["--batch", "--level", "2"],
+        "output_format": "txt",
+        "timeout": 300
+      },
+      "tplmap": {
+        "binary": "tplmap",
+        "description": "Server-side template injection scanner",
+        "default_args": ["--level", "2"],
+        "output_format": "txt",
+        "timeout": 300
+      }
+    },
+    "auth": {
+      "jwt_tool": {
+        "binary": "jwt_tool",
+        "description": "JWT token testing and exploitation",
+        "default_args": ["-M", "at"],
+        "output_format": "txt",
+        "timeout": 120
+      },
+      "subjack": {
+        "binary": "subjack",
+        "description": "Subdomain takeover vulnerability checker",
+        "default_args": ["-t", "100", "-ssl"],
+        "output_format": "json",
+        "timeout": 300
+      }
+    },
+    "api": {
+      "graphql_voyager": {
+        "binary": "graphql-voyager",
+        "description": "GraphQL schema introspection and testing",
+        "default_args": [],
+        "output_format": "json",
+        "timeout": 120
+      },
+      "testssl": {
+        "binary": "testssl.sh",
+        "description": "SSL/TLS configuration testing",
+        "default_args": ["--quiet", "--color", "0"],
+        "output_format": "json",
+        "timeout": 300
+      }
+    }
+  },
+  "agents": {
+    "bounty_hunter": {
+      "description": "Autonomous bug bounty hunting agent",
+      "phases": ["recon", "discovery", "scanning", "injection"],
+      "auto_exploit": false,
+      "severity_threshold": "medium",
+      "report_format": "html"
+    },
+    "vuln_scanner": {
+      "description": "Vulnerability scanning agent",
+      "phases": ["scanning", "injection"],
+      "templates": "all",
+      "concurrent_scans": 5
+    }
+  },
+  "workflows": {
+    "full_recon": {
+      "description": "Complete reconnaissance workflow",
+      "tools": ["subfinder", "amass", "httpx", "katana", "gau"],
+      "parallel": true
+    },
+    "vuln_scan": {
+      "description": "Vulnerability scanning workflow",
+      "tools": ["wafw00f", "nuclei", "whatweb"],
+      "parallel": false
+    },
+    "injection_test": {
+      "description": "Injection testing workflow",
+      "tools": ["sqlmap", "dalfox", "commix", "tplmap"],
+      "parallel": false
+    }
+  }
+}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - {{ target }}</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --critical: #f85149;
+            --high: #ff7b72;
+            --medium: #d29922;
+            --low: #3fb950;
+            --info: #58a6ff;
+            --accent: #238636;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 24px 0;
+            margin-bottom: 24px;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        header .meta {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .summary-card .value {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .severity-critical { color: var(--critical); }
+        .severity-high { color: var(--high); }
+        .severity-medium { color: var(--medium); }
+        .severity-low { color: var(--low); }
+        .severity-info { color: var(--info); }
+        
+        section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        section h2 {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .findings-list {
+            list-style: none;
+        }
+        
+        .finding {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .finding:last-child {
+            border-bottom: none;
+        }
+        
+        .finding-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .severity-badge.critical { background: var(--critical); color: #fff; }
+        .severity-badge.high { background: var(--high); color: #000; }
+        .severity-badge.medium { background: var(--medium); color: #000; }
+        .severity-badge.low { background: var(--low); color: #000; }
+        .severity-badge.info { background: var(--info); color: #000; }
+        
+        .finding-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .finding-url {
+            color: var(--info);
+            font-family: monospace;
+            font-size: 13px;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+        
+        .finding-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .evidence {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        td {
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .filter-buttons {
+            padding: 16px 20px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 6px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>{{ title }}</h1>
+            <div class="meta">
+                Target: {{ target }} | Generated: {{ timestamp }} | Tester: {{ tester }}
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        <!-- Executive Summary -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value">{{ total_findings }}</div>
+                <div class="label">Total Findings</div>
+            </div>
+            <div class="summary-card">
+                <div class="value severity-critical">{{ critical_count }}</div>
+                <div class="label">Critical</div>
+            </div>
+            <div class="summary-card">
+                <div class="value severity-high">{{ high_count }}</div>
+                <div class="label">High</div>
+            </div>
+            <div class="summary-card">
+                <div class="value severity-medium">{{ medium_count }}</div>
+                <div class="label">Medium</div>
+            </div>
+            <div class="summary-card">
+                <div class="value severity-low">{{ low_count }}</div>
+                <div class="label">Low</div>
+            </div>
+            <div class="summary-card">
+                <div class="value severity-info">{{ info_count }}</div>
+                <div class="label">Info</div>
+            </div>
+        </div>
+        
+        <!-- Findings -->
+        <section id="findings">
+            <h2>🔴 Vulnerability Findings</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-severity="all">All</button>
+                <button class="filter-btn" data-severity="critical">Critical</button>
+                <button class="filter-btn" data-severity="high">High</button>
+                <button class="filter-btn" data-severity="medium">Medium</button>
+                <button class="filter-btn" data-severity="low">Low</button>
+                <button class="filter-btn" data-severity="info">Info</button>
+            </div>
+            <ul class="findings-list">
+                {% for finding in findings %}
+                <li class="finding" data-severity="{{ finding.severity }}">
+                    <div class="finding-header">
+                        <span class="severity-badge {{ finding.severity }}">{{ finding.severity }}</span>
+                        <span class="finding-title">{{ finding.title }}</span>
+                    </div>
+                    {% if finding.url %}
+                    <div class="finding-url">{{ finding.url }}</div>
+                    {% endif %}
+                    {% if finding.description %}
+                    <div class="finding-description">{{ finding.description }}</div>
+                    {% endif %}
+                    {% if finding.evidence %}
+                    <div class="evidence">{{ finding.evidence }}</div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        
+        <!-- Discovered Assets -->
+        {% if subdomains %}
+        <section id="subdomains">
+            <h2>🌐 Discovered Subdomains ({{ subdomains|length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subdomain</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subdomains[:100] %}
+                    <tr>
+                        <td>{{ sub.domain }}</td>
+                        <td>{{ sub.source }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+        
+        {% if endpoints %}
+        <section id="endpoints">
+            <h2>🔗 Discovered Endpoints ({{ endpoints|length }})</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ep in endpoints[:100] %}
+                    <tr>
+                        <td style="word-break: break-all;">{{ ep.url }}</td>
+                        <td>{{ ep.method | default('GET') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        {% endif %}
+    </main>
+    
+    <footer>
+        Generated by AppSec Bounty Platform | {{ timestamp }}
+    </footer>
+    
+    <script>
+        // Severity filtering
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const severity = btn.dataset.severity;
+                
+                // Update active button
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Filter findings
+                document.querySelectorAll('.finding').forEach(finding => {
+                    if (severity === 'all' || finding.dataset.severity === severity) {
+                        finding.style.display = 'block';
+                    } else {
+                        finding.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

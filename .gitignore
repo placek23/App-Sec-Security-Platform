@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Output directories
+output/
+results/
+reports/
+screenshots/
+
+# Wordlists (large files)
+config/wordlists/*.txt
+!config/wordlists/.gitkeep
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+*.temp
+.cache/
+
+# Credentials (never commit)
+*.env
+.env.*
+credentials.json
+secrets.json
+api_keys.txt
+
+# Tool-specific
+.nuclei/
+.httpx/
+.subfinder/

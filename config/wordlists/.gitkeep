@@ -1,0 +1,2 @@
+# This file ensures the wordlists directory is tracked by git
+# Download wordlists using: ./scripts/setup_phase1.sh
