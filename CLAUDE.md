@@ -40,6 +40,26 @@ python wrappers/discovery/secretfinder.py -u https://example.com/app.js
 python wrappers/discovery/gowitness.py -u https://example.com
 ```
 
+### Proxy & Manual Testing (Phase 2)
+```bash
+# ZAP Integration (requires ZAP running)
+python wrappers/proxy/zap_integration.py --target https://example.com --full
+python wrappers/proxy/zap_integration.py --target https://example.com --spider --scan
+
+# Request Builder for manual testing
+python wrappers/proxy/request_builder.py --url https://example.com/api --method POST --data '{"test": 1}'
+python wrappers/proxy/request_builder.py --url https://example.com/search?q=test --fuzz-param q --wordlist wordlists/xss.txt
+
+# Session Manager for authentication
+python wrappers/proxy/session_manager.py --action create --name admin_session
+python wrappers/proxy/session_manager.py --action list
+
+# Payload Encoder for bypass testing
+python utils/encoder.py "<script>alert(1)</script>"
+python utils/encoder.py "' OR 1=1--" --encode url --encode base64
+python utils/encoder.py --xss "<script>alert(1)</script>"
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com
@@ -58,11 +78,13 @@ python wrappers/injection/sqlmap.py -u "https://example.com/page?id=1" --batch
 ```bash
 pip install -r requirements.txt
 ./scripts/setup_phase1.sh  # Install Phase 1 tools
+./scripts/setup_phase2.sh  # Install Phase 2 tools (ZAP, mitmproxy, etc.)
 ```
 
 ### Validate Installation
 ```bash
 python scripts/validate_phase1.py
+python scripts/validate_phase2.py
 python scripts/test_phase1.py
 ```
 
@@ -86,6 +108,7 @@ All tool wrappers inherit from `BaseToolWrapper` in `utils/base_wrapper.py`. Cat
 - `InjectionTool` - injection testing (sqlmap, dalfox, commix, tplmap)
 - `AuthTool` - authentication testing (jwt_tool, subjack)
 - `APITool` - API testing (graphql_voyager, testssl)
+- `ProxyTool` - proxy integration tools (ZAP, mitmproxy)
 
 **Web Discovery Tools** (Phase 1):
 - `GobusterWrapper` - Directory/file brute forcing
@@ -93,6 +116,12 @@ All tool wrappers inherit from `BaseToolWrapper` in `utils/base_wrapper.py`. Cat
 - `LinkFinderWrapper` - JavaScript endpoint extraction
 - `SecretFinderWrapper` - Secret detection in JS files
 - `GoWitnessWrapper` - Screenshot capture
+
+**Proxy & Manual Testing Tools** (Phase 2):
+- `ZAPIntegration` - OWASP ZAP spider, scan, and report generation
+- `RequestBuilder` - HTTP request building, fuzzing, and history tracking
+- `SessionManager` - Authentication session and token management
+- `PayloadEncoder` - Encoding utilities for bypass testing
 
 Each wrapper must implement:
 - `tool_name` property - returns tool binary name
@@ -134,11 +163,18 @@ Each wrapper must implement:
 
 ### Key Classes
 
+**Workflows & Agents**:
 - `PassiveReconWorkflow` (`workflows/passive_recon.py`): Combines all passive OSINT tools for comprehensive reconnaissance without target interaction
 - `WebDiscoveryWorkflow` (`workflows/web_discovery.py`): Runs directory discovery, JS analysis, and screenshot capture
 - `BountyHunterAgent` (`agents/bounty_hunter.py`): Orchestrates the complete multi-phase pipeline with scope filtering, timeout management, and report generation
 - `FullReconWorkflow` (`workflows/full_recon.py`): Runs parallel subdomain discovery, HTTP probing, crawling, and URL harvesting
 - `Reporter` (`utils/reporter.py`): Generates HTML/JSON/Markdown reports with severity breakdowns
+
+**Phase 2 - Manual Testing Support**:
+- `ZAPIntegration` (`wrappers/proxy/zap_integration.py`): OWASP ZAP API integration for spidering, active scanning, and report generation
+- `RequestBuilder` (`wrappers/proxy/request_builder.py`): HTTP request builder with fuzzing, history tracking, and HAR export
+- `SessionManager` (`wrappers/proxy/session_manager.py`): Session/token management for JWT, API keys, Basic auth with persistence
+- `PayloadEncoder` (`utils/encoder.py`): Encoding utilities (URL, Base64, HTML, Unicode, Hex) with XSS/SQL bypass variants
 
 ### Configuration
 
@@ -161,6 +197,9 @@ All output goes to `./output/` by default:
 - `output/scanning/` - Nuclei findings, WAF info
 - `output/injection/` - SQLi, XSS, command injection results
 - `output/bounty_*/` - Full hunt results with HTML report
+- `output/zap/` - ZAP scan reports (HTML, JSON, XML)
+- `output/sessions/` - Session and token storage for manual testing
+- `output/proxy/` - Request/response history exports
 
 ## External Tool Requirements
 
@@ -176,19 +215,25 @@ This platform wraps external security tools that must be installed separately:
 **Python Tools**:
 - arjun, wafw00f, sqlmap, commix, dirsearch
 - LinkFinder, SecretFinder (installed to ~/tools/)
+- mitmproxy (interactive proxy)
+- python-owasp-zap-v2.4 (ZAP API client)
+
+**External Applications**:
+- OWASP ZAP (snap, download, or Docker)
 
 ## Implementation Phases
 
 ### Completed
 - **Phase 1**: Web Discovery & Reconnaissance (Gobuster, Dirsearch, LinkFinder, SecretFinder, GoWitness)
 - **Passive Recon**: DNS enumeration, CT logs, WHOIS, Wayback Machine, OSINT/dorks
+- **Phase 2**: Manual Testing Support & Proxy Integration (ZAP, RequestBuilder, SessionManager, PayloadEncoder)
 
 ### Planned
-- **Phase 2**: Vulnerability Scanning Enhancement (Nikto, WPScan, JWT testing)
-- **Phase 3**: Advanced Injection Testing (NoSQLMap, SSRFMap, XXEinjector)
-- **Phase 4**: Authentication & Session Testing (Hydra, Patator, session analysis)
-- **Phase 5**: API Security Testing (GraphQL introspection, REST testing)
-- **Phase 6**: Reporting & Integration (Defect Dojo, custom dashboards)
+- **Phase 3**: Advanced Injection Testing (NoSQLMap, SSRFMap, XXEinjector, LDAP, XPath)
+- **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
+- **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI)
+- **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Hydra)
+- **Phase 6**: Reporting & Integration Enhancement (PDF reports, database storage, advanced analytics)
 
 ## Legal Notice
 

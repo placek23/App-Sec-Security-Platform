@@ -5,3 +5,5 @@ from .scanning import *
 from .injection import *
 from .auth import *
 from .api import *
+from .proxy import *
+from .passive import *

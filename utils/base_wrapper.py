@@ -222,7 +222,15 @@ class AuthTool(BaseToolWrapper):
 
 class APITool(BaseToolWrapper):
     """Base class for API testing tools"""
-    
+
     @property
     def tool_category(self) -> str:
         return "api"
+
+
+class ProxyTool(BaseToolWrapper):
+    """Base class for proxy and manual testing tools"""
+
+    @property
+    def tool_category(self) -> str:
+        return "proxy"

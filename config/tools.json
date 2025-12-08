@@ -180,6 +180,39 @@
         "output_format": "json",
         "timeout": 300
       }
+    },
+    "proxy": {
+      "zap": {
+        "binary": "zap.sh",
+        "description": "OWASP ZAP - Web Application Security Scanner",
+        "default_args": ["-daemon", "-port", "8080"],
+        "api_port": 8080,
+        "timeout": 3600,
+        "config": {
+          "spider_max_depth": 5,
+          "active_scan_policy": "Default Policy",
+          "ajax_spider_enabled": true
+        }
+      },
+      "mitmproxy": {
+        "binary": "mitmproxy",
+        "description": "Interactive HTTPS proxy",
+        "default_args": ["--listen-port", "8081"],
+        "timeout": 3600
+      },
+      "mitmdump": {
+        "binary": "mitmdump",
+        "description": "mitmproxy command-line tool",
+        "default_args": ["--listen-port", "8081"],
+        "timeout": 3600
+      },
+      "ffuf_fuzz": {
+        "binary": "ffuf",
+        "description": "Fast fuzzer for parameter discovery",
+        "default_args": ["-c", "-t", "40", "-mc", "all", "-fc", "404"],
+        "output_format": "json",
+        "timeout": 600
+      }
     }
   },
   "agents": {
@@ -211,6 +244,22 @@
     "injection_test": {
       "description": "Injection testing workflow",
       "tools": ["sqlmap", "dalfox", "commix", "tplmap"],
+      "parallel": false
+    },
+    "proxy_scan": {
+      "description": "ZAP-based proxy scanning workflow",
+      "tools": ["zap"],
+      "parallel": false,
+      "config": {
+        "spider": true,
+        "ajax_spider": false,
+        "active_scan": true,
+        "report_format": "html"
+      }
+    },
+    "manual_test": {
+      "description": "Manual testing support workflow",
+      "tools": ["request_builder", "session_manager", "encoder"],
       "parallel": false
     }
   }
