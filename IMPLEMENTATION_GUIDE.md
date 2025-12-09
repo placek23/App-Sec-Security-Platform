@@ -9,7 +9,7 @@
 | **Phase 3** | Advanced Injection Testing | Completed |
 | **Phase 3.5** | Advanced Web Vulnerabilities | Completed |
 | **Phase 4** | API & Modern Application Testing | Completed |
-| **Phase 5** | Authentication & Authorization Testing | Planned |
+| **Phase 5** | Authentication & Authorization Testing | Completed |
 | **Phase 6** | Reporting & Integration Enhancement | Planned |
 
 ---
@@ -1959,7 +1959,7 @@ python3 -c "import websocket; print('WebSocket OK')"
 
 ---
 
-# PHASE 5: Authentication & Authorization Testing
+# PHASE 5: Authentication & Authorization Testing [COMPLETED]
 
 ## 5.1 Tool Installation
 
@@ -2298,7 +2298,13 @@ class JWTTester(AuthTool):
 
 ## 5.3 Validation
 ```bash
-# Test Hydra
+# Run setup script
+./scripts/setup_phase5.sh
+
+# Run validation script
+python scripts/validate_phase5.py
+
+# Test Hydra (optional)
 hydra -h
 
 # Test JWT tool
@@ -2306,6 +2312,87 @@ python3 ~/tools/jwt_tool/jwt_tool.py --help
 
 # Test Python imports
 python3 -c "import jwt; print('PyJWT OK')"
+
+# Test wrapper imports
+python3 -c "from wrappers.auth import AuthBypassTester, IDORTester, JWTAttacksTester, PrivilegeEscalationTester; print('Phase 5 wrappers OK')"
+
+# Test workflow
+python3 -c "from workflows.auth_testing import AuthTestingWorkflow; print('Auth workflow OK')"
+```
+
+## 5.4 Usage Examples
+
+### Authentication Bypass Testing
+```bash
+# Test login form for SQL injection and default credentials
+python wrappers/auth/auth_bypass.py -u https://example.com/login
+
+# Test with custom field names
+python wrappers/auth/auth_bypass.py -u https://example.com/login \
+    --username-field user --password-field pass
+
+# Test specific bypass types
+python wrappers/auth/auth_bypass.py -u https://example.com/login \
+    --test-types sql,default,header
+```
+
+### IDOR Testing
+```bash
+# Test numeric IDOR
+python wrappers/auth/idor_tester.py -u "https://api.example.com/users/{id}" -p id
+
+# Test with authentication
+python wrappers/auth/idor_tester.py -u "https://api.example.com/profile" \
+    -p user_id -t "Bearer token123" --start-id 1 --count 50
+
+# Test UUID-based IDOR
+python wrappers/auth/idor_tester.py -u "https://api.example.com/doc/{uuid}" \
+    --test-types uuid --known-uuid "abc-123"
+```
+
+### JWT Security Testing
+```bash
+# Decode and analyze JWT
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --decode
+
+# Full JWT attack suite
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --url https://api.example.com/me
+
+# Test for weak secrets
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --url https://api.example.com/me \
+    --wordlist config/payloads/auth/jwt/common_secrets.txt
+```
+
+### Privilege Escalation Testing
+```bash
+# Test admin endpoint access
+python wrappers/auth/privilege_escalation.py -u https://example.com
+
+# Test with low-privilege token
+python wrappers/auth/privilege_escalation.py -u https://example.com \
+    -t "Bearer low_priv_token" --test-types endpoint,role,param
+```
+
+### Password Brute Forcing (Hydra)
+```bash
+# SSH brute force
+python wrappers/auth/hydra_wrapper.py -t 192.168.1.1 -s ssh \
+    -l admin -P config/wordlists/10k-most-common.txt
+
+# HTTP form brute force
+python wrappers/auth/hydra_wrapper.py -t example.com -s http-post-form \
+    --form-path "/login" --form-data "user=^USER^&pass=^PASS^" \
+    --fail-string "Invalid" -L users.txt -P passwords.txt
+```
+
+### Full Workflow
+```bash
+# Comprehensive auth testing
+python workflows/auth_testing.py -t https://example.com \
+    --login-url https://example.com/login \
+    --api-url "https://api.example.com/users/{id}" \
+    --jwt-token "eyJhbG..." \
+    --jwt-test-url https://api.example.com/me
 ```
 
 ---

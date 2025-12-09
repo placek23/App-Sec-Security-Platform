@@ -163,6 +163,45 @@
         "default_args": ["-t", "100", "-ssl"],
         "output_format": "json",
         "timeout": 300
+      },
+      "auth_bypass": {
+        "binary": "python",
+        "description": "Authentication bypass testing (SQL injection, default creds, headers)",
+        "default_args": [],
+        "output_format": "json",
+        "timeout": 600
+      },
+      "idor_tester": {
+        "binary": "python",
+        "description": "IDOR vulnerability testing (numeric, UUID, encoded IDs)",
+        "default_args": [],
+        "output_format": "json",
+        "timeout": 600
+      },
+      "jwt_attacks": {
+        "binary": "python",
+        "description": "Advanced JWT attacks (none alg, confusion, weak secrets, KID injection)",
+        "default_args": [],
+        "output_format": "json",
+        "timeout": 300
+      },
+      "hydra": {
+        "binary": "hydra",
+        "description": "THC Hydra password brute forcing",
+        "default_args": ["-f", "-t", "16"],
+        "output_format": "txt",
+        "timeout": 1800,
+        "wordlists": {
+          "passwords": "config/wordlists/10k-most-common.txt",
+          "usernames": "config/wordlists/top-usernames-shortlist.txt"
+        }
+      },
+      "privilege_escalation": {
+        "binary": "python",
+        "description": "Vertical privilege escalation testing",
+        "default_args": [],
+        "output_format": "json",
+        "timeout": 600
       }
     },
     "api": {
@@ -261,6 +300,18 @@
       "description": "Manual testing support workflow",
       "tools": ["request_builder", "session_manager", "encoder"],
       "parallel": false
+    },
+    "auth_test": {
+      "description": "Authentication & authorization testing workflow",
+      "tools": ["auth_bypass", "idor_tester", "jwt_attacks", "privilege_escalation"],
+      "parallel": false,
+      "config": {
+        "test_default_creds": true,
+        "test_sql_bypass": true,
+        "test_idor": true,
+        "test_jwt": true,
+        "test_priv_esc": true
+      }
     }
   }
 }

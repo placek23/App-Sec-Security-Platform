@@ -138,6 +138,37 @@ python wrappers/api/jwt_tester.py -t "eyJhbGciOiJIUzI1NiIs..."
 python wrappers/api/jwt_tester.py -t "eyJ..." --url https://api.example.com/me --wordlist jwt_secrets.txt
 ```
 
+### Authentication & Authorization Testing (Phase 5)
+```bash
+# Full auth testing workflow
+python workflows/auth_testing.py -t https://example.com --login-url https://example.com/login
+python workflows/auth_testing.py -t https://example.com --login-url /login --api-url "/api/users/{id}" --jwt-token "eyJ..."
+
+# Authentication Bypass Testing
+python wrappers/auth/auth_bypass.py -u https://example.com/login
+python wrappers/auth/auth_bypass.py -u https://example.com/login --username-field user --password-field pass
+python wrappers/auth/auth_bypass.py -u https://example.com/login --test-types sql,default,header,path
+
+# IDOR Vulnerability Testing
+python wrappers/auth/idor_tester.py -u "https://api.example.com/users/{id}" -p id
+python wrappers/auth/idor_tester.py -u "https://api.example.com/profile" -p user_id -t "Bearer token" --count 50
+python wrappers/auth/idor_tester.py -u "https://api.example.com/doc/{uuid}" --test-types uuid,path
+
+# JWT Attack Testing
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --decode
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --url https://api.example.com/me
+python wrappers/auth/jwt_attacks.py -t "eyJhbG..." --url https://api.example.com/me --test-types none,weak,kid
+
+# Privilege Escalation Testing
+python wrappers/auth/privilege_escalation.py -u https://example.com
+python wrappers/auth/privilege_escalation.py -u https://example.com -t "Bearer low_priv_token"
+python wrappers/auth/privilege_escalation.py -u https://example.com --test-types endpoint,role,param,header
+
+# Password Brute Forcing (Hydra)
+python wrappers/auth/hydra_wrapper.py -t 192.168.1.1 -s ssh -l admin -P passwords.txt
+python wrappers/auth/hydra_wrapper.py -t example.com -s http-post-form --form-path "/login" --form-data "user=^USER^&pass=^PASS^" --fail-string "Invalid"
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com
@@ -312,9 +343,9 @@ This platform wraps external security tools that must be installed separately:
 - **Phase 3**: Advanced Injection Testing (NoSQL, LDAP, XPath injection + Advanced XSS with DOM/CSP bypass)
 - **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
 - **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI, JWT)
+- **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Privilege Escalation, Hydra)
 
 ### Planned
-- **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Hydra)
 - **Phase 6**: Reporting & Integration Enhancement (PDF reports, database storage, advanced analytics)
 
 ## Legal Notice
