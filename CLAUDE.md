@@ -79,6 +79,37 @@ python wrappers/injection/advanced_xss.py -u "https://example.com/search" -p q
 python wrappers/injection/advanced_xss.py -u "https://example.com/page" -p input --test-dom
 ```
 
+### Advanced Web Vulnerabilities (Phase 3.5)
+```bash
+# Full advanced vulnerability scan
+python workflows/advanced_vulns.py -t "https://example.com"
+python workflows/advanced_vulns.py -t "https://example.com/api" --callback http://your-callback.com
+
+# SSRF Testing
+python wrappers/advanced/ssrf_tester.py -u "https://example.com/fetch" -p url
+python wrappers/advanced/ssrf_tester.py -u "https://example.com/proxy" -p target --test-type cloud
+
+# XXE Injection Testing
+python wrappers/advanced/xxe_injector.py -u "https://example.com/api/xml"
+python wrappers/advanced/xxe_injector.py -u "https://example.com/upload" --callback http://your-callback.com
+
+# HTTP Request Smuggling
+python wrappers/advanced/http_smuggler.py -u "https://example.com/"
+python wrappers/advanced/http_smuggler.py -u "https://example.com/" --test-type tete
+
+# Race Condition Testing
+python wrappers/advanced/race_condition.py -u "https://example.com/redeem" -n 20
+python wrappers/advanced/race_condition.py -u "https://example.com/vote" --test-type limit
+
+# CORS Misconfiguration Testing
+python wrappers/advanced/cors_tester.py -u "https://example.com/api/data"
+python wrappers/advanced/cors_tester.py -u "https://api.example.com/users" --origins "https://evil.com"
+
+# File Upload Bypass Testing
+python wrappers/advanced/file_upload_bypass.py -u "https://example.com/upload"
+python wrappers/advanced/file_upload_bypass.py -u "https://example.com/upload" --param uploadFile --test-type all
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com

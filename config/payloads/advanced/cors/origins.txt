@@ -1,0 +1,49 @@
+# External malicious origins
+https://evil.com
+https://attacker.com
+https://malicious-site.com
+http://evil.com
+
+# Null origin (sandboxed iframe, file://)
+null
+
+# Pre-domain attacks
+# Replace TARGET with actual target domain
+https://evilTARGET.com
+https://attackerTARGET.com
+
+# Post-domain attacks
+https://TARGET.evil.com
+https://TARGETevil.com
+https://TARGET.attacker.com
+
+# Subdomain attacks
+https://evil.TARGET.com
+https://attacker.TARGET.com
+https://test.evil.TARGET.com
+
+# Protocol downgrade
+http://TARGET.com
+
+# Port variations
+https://TARGET.com:443
+https://TARGET.com:8443
+https://TARGET.com:4443
+
+# Special characters
+https://TARGET.com`.evil.com
+https://TARGET.com%60.evil.com
+
+# Regex bypass
+https://TARGET.com@evil.com
+https://evil.com?.TARGET.com
+https://evil.com#TARGET.com
+https://evil.com/TARGET.com
+
+# Unicode variations
+https://TARGET%E3%80%82evil.com
+
+# Alternative TLDs
+https://TARGET.co
+https://TARGET.io
+https://TARGET.xyz
