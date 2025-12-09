@@ -60,6 +60,25 @@ python utils/encoder.py "' OR 1=1--" --encode url --encode base64
 python utils/encoder.py --xss "<script>alert(1)</script>"
 ```
 
+### Advanced Injection Testing (Phase 3)
+```bash
+# NoSQL Injection Testing
+python wrappers/injection/nosql_injection.py -u "https://example.com/api/users" -p username
+python wrappers/injection/nosql_injection.py -u "https://example.com/login" --test-auth
+
+# LDAP Injection Testing
+python wrappers/injection/ldap_injection.py -u "https://example.com/search" -p query
+python wrappers/injection/ldap_injection.py -u "https://example.com/auth" -p user --test-blind
+
+# XPath Injection Testing
+python wrappers/injection/xpath_injection.py -u "https://example.com/xml" -p id
+python wrappers/injection/xpath_injection.py -u "https://example.com/search" -p q --test-blind
+
+# Advanced XSS Testing (DOM, CSP Bypass)
+python wrappers/injection/advanced_xss.py -u "https://example.com/search" -p q
+python wrappers/injection/advanced_xss.py -u "https://example.com/page" -p input --test-dom
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com
@@ -79,12 +98,14 @@ python wrappers/injection/sqlmap.py -u "https://example.com/page?id=1" --batch
 pip install -r requirements.txt
 ./scripts/setup_phase1.sh  # Install Phase 1 tools
 ./scripts/setup_phase2.sh  # Install Phase 2 tools (ZAP, mitmproxy, etc.)
+./scripts/setup_phase3.sh  # Install Phase 3 tools (Advanced injection testing)
 ```
 
 ### Validate Installation
 ```bash
 python scripts/validate_phase1.py
 python scripts/validate_phase2.py
+python scripts/validate_phase3.py
 python scripts/test_phase1.py
 ```
 
@@ -227,9 +248,9 @@ This platform wraps external security tools that must be installed separately:
 - **Phase 1**: Web Discovery & Reconnaissance (Gobuster, Dirsearch, LinkFinder, SecretFinder, GoWitness)
 - **Passive Recon**: DNS enumeration, CT logs, WHOIS, Wayback Machine, OSINT/dorks
 - **Phase 2**: Manual Testing Support & Proxy Integration (ZAP, RequestBuilder, SessionManager, PayloadEncoder)
+- **Phase 3**: Advanced Injection Testing (NoSQL, LDAP, XPath injection + Advanced XSS with DOM/CSP bypass)
 
 ### Planned
-- **Phase 3**: Advanced Injection Testing (NoSQLMap, SSRFMap, XXEinjector, LDAP, XPath)
 - **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
 - **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI)
 - **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Hydra)

