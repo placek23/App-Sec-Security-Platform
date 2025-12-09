@@ -1,0 +1,91 @@
+# Common OpenAPI/Swagger Specification Paths
+
+# Swagger 2.0
+/swagger.json
+/swagger.yaml
+/swagger.yml
+/swagger-ui
+/swagger-ui.html
+/swagger-ui/
+/swagger-resources
+/swagger-resources/configuration/ui
+/swagger-resources/configuration/security
+
+# Swagger versioned paths
+/swagger/v1/swagger.json
+/swagger/v2/swagger.json
+/swagger/v3/swagger.json
+
+# OpenAPI 3.0
+/openapi.json
+/openapi.yaml
+/openapi.yml
+/openapi/
+/openapi/v1.json
+/openapi/v2.json
+/openapi/v3.json
+
+# API Documentation paths
+/api-docs
+/api-docs.json
+/api-docs.yaml
+/api/docs
+/api/documentation
+/docs
+/docs/
+/documentation
+/documentation/api
+
+# API prefixed paths
+/api/swagger.json
+/api/swagger.yaml
+/api/openapi.json
+/api/openapi.yaml
+/api/v1/swagger.json
+/api/v2/swagger.json
+/api/v1/openapi.json
+/api/v2/openapi.json
+/api/v1/api-docs
+/api/v2/api-docs
+
+# Versioned API docs
+/v1/swagger.json
+/v2/swagger.json
+/v3/swagger.json
+/v1/openapi.json
+/v2/openapi.json
+/v1/api-docs
+/v2/api-docs
+
+# Well-known paths
+/.well-known/openapi.json
+/.well-known/openapi.yaml
+/.well-known/api
+
+# Framework specific
+# Spring Boot
+/v2/api-docs
+/v3/api-docs
+/actuator/swagger-ui.html
+
+# .NET/ASP.NET
+/swagger/index.html
+/swagger/v1/swagger.json
+
+# Django REST Framework
+/api/schema/
+/api/schema.json
+/api/schema.yaml
+
+# FastAPI
+/docs
+/redoc
+/openapi.json
+
+# Other
+/api-documentation
+/api-spec
+/spec
+/spec.json
+/schema
+/schema.json

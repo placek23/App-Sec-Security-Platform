@@ -110,6 +110,34 @@ python wrappers/advanced/file_upload_bypass.py -u "https://example.com/upload"
 python wrappers/advanced/file_upload_bypass.py -u "https://example.com/upload" --param uploadFile --test-type all
 ```
 
+### API & Modern Application Testing (Phase 4)
+```bash
+# Full API security scan
+python workflows/api_testing.py -t https://api.example.com
+python workflows/api_testing.py -t https://api.example.com --test discovery,openapi,graphql
+
+# API Endpoint Discovery (Kiterunner)
+python wrappers/api/kiterunner.py -u https://api.example.com
+python wrappers/api/kiterunner.py -u https://example.com -w /path/to/wordlist.txt
+python wrappers/api/kiterunner.py -u https://example.com --fallback
+
+# GraphQL Security Testing
+python wrappers/api/graphql_tester.py -u https://example.com/graphql
+python wrappers/api/graphql_tester.py -u https://example.com/graphql --tests introspection,batch,depth
+
+# WebSocket Security Testing
+python wrappers/api/websocket_tester.py -u wss://example.com/ws
+python wrappers/api/websocket_tester.py -u wss://example.com/ws --tests origin,auth,injection
+
+# OpenAPI/Swagger Analysis
+python wrappers/api/openapi_analyzer.py -u https://api.example.com
+python wrappers/api/openapi_analyzer.py -u https://api.example.com --spec swagger.json --test
+
+# JWT Security Testing
+python wrappers/api/jwt_tester.py -t "eyJhbGciOiJIUzI1NiIs..."
+python wrappers/api/jwt_tester.py -t "eyJ..." --url https://api.example.com/me --wordlist jwt_secrets.txt
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com
@@ -130,6 +158,7 @@ pip install -r requirements.txt
 ./scripts/setup_phase1.sh  # Install Phase 1 tools
 ./scripts/setup_phase2.sh  # Install Phase 2 tools (ZAP, mitmproxy, etc.)
 ./scripts/setup_phase3.sh  # Install Phase 3 tools (Advanced injection testing)
+./scripts/setup_phase4.sh  # Install Phase 4 tools (API testing)
 ```
 
 ### Validate Installation
@@ -137,6 +166,7 @@ pip install -r requirements.txt
 python scripts/validate_phase1.py
 python scripts/validate_phase2.py
 python scripts/validate_phase3.py
+python scripts/validate_phase4.py
 python scripts/test_phase1.py
 ```
 
@@ -159,7 +189,7 @@ All tool wrappers inherit from `BaseToolWrapper` in `utils/base_wrapper.py`. Cat
 - `ScanningTool` - vulnerability scanning (nuclei, wafw00f, whatweb)
 - `InjectionTool` - injection testing (sqlmap, dalfox, commix, tplmap)
 - `AuthTool` - authentication testing (jwt_tool, subjack)
-- `APITool` - API testing (graphql_voyager, testssl)
+- `APITool` - API testing (graphql_voyager, testssl, kiterunner, graphql_tester, websocket_tester, openapi_analyzer, jwt_tester)
 - `ProxyTool` - proxy integration tools (ZAP, mitmproxy)
 
 **Web Discovery Tools** (Phase 1):
@@ -280,10 +310,10 @@ This platform wraps external security tools that must be installed separately:
 - **Passive Recon**: DNS enumeration, CT logs, WHOIS, Wayback Machine, OSINT/dorks
 - **Phase 2**: Manual Testing Support & Proxy Integration (ZAP, RequestBuilder, SessionManager, PayloadEncoder)
 - **Phase 3**: Advanced Injection Testing (NoSQL, LDAP, XPath injection + Advanced XSS with DOM/CSP bypass)
+- **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
+- **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI, JWT)
 
 ### Planned
-- **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
-- **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI)
 - **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Hydra)
 - **Phase 6**: Reporting & Integration Enhancement (PDF reports, database storage, advanced analytics)
 
