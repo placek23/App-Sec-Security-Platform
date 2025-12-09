@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ metadata.title | default('Security Assessment Report') }}</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --critical: #ff0054;
+            --high: #ff6b6b;
+            --medium: #feca57;
+            --low: #48dbfb;
+            --info: #1dd1a1;
+            --text: #e0e0e0;
+            --text-muted: #888;
+            --bg: #0a0a0a;
+            --card-bg: #1a1a2e;
+            --border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 50px 20px;
+            border-bottom: 4px solid var(--accent);
+            text-align: center;
+        }
+
+        header h1 {
+            color: var(--accent);
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header .meta {
+            color: var(--text-muted);
+            font-size: 1em;
+            margin: 5px 0;
+        }
+
+        header code {
+            background: var(--bg);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            color: var(--accent);
+        }
+
+        /* Section Headers */
+        h2 {
+            color: var(--accent);
+            margin: 40px 0 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            color: var(--text);
+            margin: 20px 0 10px;
+            font-size: 1.3em;
+        }
+
+        /* Risk Score Banner */
+        .risk-banner {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+
+        .risk-banner .rating {
+            font-size: 3.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .risk-banner .rating.critical { color: var(--critical); }
+        .risk-banner .rating.high { color: var(--high); }
+        .risk-banner .rating.medium { color: var(--medium); }
+        .risk-banner .rating.low { color: var(--low); }
+        .risk-banner .rating.informational { color: var(--info); }
+
+        .risk-banner .metrics {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .risk-banner .metric {
+            text-align: center;
+        }
+
+        .risk-banner .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .risk-banner .metric-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 900px) {
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .summary-card.critical { border-color: var(--critical); }
+        .summary-card.high { border-color: var(--high); }
+        .summary-card.medium { border-color: var(--medium); }
+        .summary-card.low { border-color: var(--low); }
+        .summary-card.info { border-color: var(--info); }
+
+        .summary-card .count {
+            font-size: 3.5em;
+            font-weight: bold;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .summary-card.critical .count { color: var(--critical); }
+        .summary-card.high .count { color: var(--high); }
+        .summary-card.medium .count { color: var(--medium); }
+        .summary-card.low .count { color: var(--low); }
+        .summary-card.info .count { color: var(--info); }
+
+        .summary-card .label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Statistics */
+        .stats-row {
+            display: flex;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-item strong {
+            color: var(--accent);
+        }
+
+        /* Finding Cards */
+        .finding {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid var(--border);
+            transition: box-shadow 0.2s;
+        }
+
+        .finding:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .finding.critical { border-left-color: var(--critical); }
+        .finding.high { border-left-color: var(--high); }
+        .finding.medium { border-left-color: var(--medium); }
+        .finding.low { border-left-color: var(--low); }
+        .finding.info { border-left-color: var(--info); }
+
+        .finding-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .finding-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+            flex: 1;
+        }
+
+        .finding-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .badge.critical { background: var(--critical); color: white; }
+        .badge.high { background: var(--high); color: white; }
+        .badge.medium { background: var(--medium); color: black; }
+        .badge.low { background: var(--low); color: black; }
+        .badge.info { background: var(--info); color: black; }
+
+        .badge.cvss {
+            background: var(--secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .finding-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .finding-meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .finding-meta-label {
+            color: var(--text-muted);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        .finding-meta-value {
+            color: var(--text);
+        }
+
+        .finding-meta-value code {
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent);
+            font-size: 0.9em;
+        }
+
+        .finding-section {
+            margin: 15px 0;
+        }
+
+        .finding-section-title {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .finding-section-content {
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .evidence-block {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            border: 1px solid var(--border);
+        }
+
+        .remediation {
+            background: rgba(29, 209, 161, 0.1);
+            border: 1px solid var(--info);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .remediation-title {
+            color: var(--info);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--accent);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        td code {
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent);
+            font-size: 0.85em;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--info);
+            font-size: 1.2em;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+        }
+
+        footer .warning {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            color: var(--accent);
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .finding {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            header {
+                background: white;
+                color: black;
+                border-color: black;
+            }
+
+            h1, h2, .badge {
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>{{ metadata.title | default('Security Assessment Report') }}</h1>
+            <p class="meta">Target: <code>{{ metadata.target | default('Unknown') }}</code></p>
+            <p class="meta">Generated: {{ summary.generated_at | default('N/A') }}</p>
+            <p class="meta">By: {{ metadata.tester | default('AppSec Bounty Platform') }}</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Executive Summary -->
+        <h2>Executive Summary</h2>
+
+        <div class="risk-banner">
+            <div class="rating {{ summary.risk_rating | lower }}">{{ summary.risk_rating | upper }}</div>
+            <div>Overall Risk Rating</div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-value">{{ summary.risk_score }}%</div>
+                    <div class="metric-label">Risk Score</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">{{ summary.average_cvss }}</div>
+                    <div class="metric-label">Avg CVSS</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">{{ summary.total_findings }}</div>
+                    <div class="metric-label">Total Findings</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Severity Breakdown -->
+        <div class="summary-grid">
+            <div class="summary-card critical">
+                <div class="count">{{ summary.severity_breakdown.critical }}</div>
+                <div class="label">Critical</div>
+            </div>
+            <div class="summary-card high">
+                <div class="count">{{ summary.severity_breakdown.high }}</div>
+                <div class="label">High</div>
+            </div>
+            <div class="summary-card medium">
+                <div class="count">{{ summary.severity_breakdown.medium }}</div>
+                <div class="label">Medium</div>
+            </div>
+            <div class="summary-card low">
+                <div class="count">{{ summary.severity_breakdown.low }}</div>
+                <div class="label">Low</div>
+            </div>
+            <div class="summary-card info">
+                <div class="count">{{ summary.severity_breakdown.info }}</div>
+                <div class="label">Info</div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-item"><strong>{{ summary.total_subdomains }}</strong> Subdomains Discovered</div>
+            <div class="stat-item"><strong>{{ summary.total_endpoints }}</strong> Endpoints Discovered</div>
+            <div class="stat-item"><strong>{{ summary.verified_findings }}</strong> Verified Findings</div>
+        </div>
+
+        <!-- Findings Section -->
+        <h2>Findings</h2>
+
+        {% if findings %}
+            {% for severity in ['critical', 'high', 'medium', 'low', 'info'] %}
+                {% if grouped_findings[severity] %}
+                    <h3>{{ severity | capitalize }} Severity</h3>
+                    {% for finding in grouped_findings[severity] %}
+                        <div class="finding {{ finding.severity | lower }}">
+                            <div class="finding-header">
+                                <span class="finding-title">{{ finding.title }}</span>
+                                <div class="finding-badges">
+                                    <span class="badge {{ finding.severity | lower }}">{{ finding.severity | upper }}</span>
+                                    {% if finding.cvss_score %}
+                                        <span class="badge cvss">CVSS {{ finding.cvss_score }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="finding-meta">
+                                {% if finding.tool %}
+                                    <div class="finding-meta-item">
+                                        <span class="finding-meta-label">Tool</span>
+                                        <span class="finding-meta-value">{{ finding.tool }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if finding.finding_type %}
+                                    <div class="finding-meta-item">
+                                        <span class="finding-meta-label">Type</span>
+                                        <span class="finding-meta-value">{{ finding.finding_type }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if finding.cwe_id %}
+                                    <div class="finding-meta-item">
+                                        <span class="finding-meta-label">CWE</span>
+                                        <span class="finding-meta-value">{{ finding.cwe_id }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if finding.url %}
+                                    <div class="finding-meta-item">
+                                        <span class="finding-meta-label">URL</span>
+                                        <span class="finding-meta-value"><code>{{ finding.url[:80] }}{% if finding.url|length > 80 %}...{% endif %}</code></span>
+                                    </div>
+                                {% endif %}
+                                {% if finding.parameter %}
+                                    <div class="finding-meta-item">
+                                        <span class="finding-meta-label">Parameter</span>
+                                        <span class="finding-meta-value"><code>{{ finding.parameter }}</code></span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if finding.description %}
+                                <div class="finding-section">
+                                    <div class="finding-section-title">Description</div>
+                                    <div class="finding-section-content">{{ finding.description }}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if finding.evidence %}
+                                <div class="finding-section">
+                                    <div class="finding-section-title">Evidence</div>
+                                    <div class="evidence-block">{{ finding.evidence[:1000] }}{% if finding.evidence|length > 1000 %}...{% endif %}</div>
+                                </div>
+                            {% endif %}
+
+                            {% if finding.remediation %}
+                                <div class="remediation">
+                                    <div class="remediation-title">Remediation</div>
+                                    <div>{{ finding.remediation }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">No vulnerabilities found during this assessment.</div>
+        {% endif %}
+
+        <!-- Subdomains Section -->
+        <h2>Discovered Subdomains</h2>
+
+        {% if subdomains %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subdomain</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subdomains[:100] %}
+                        <tr>
+                            <td><code>{{ sub.domain }}</code></td>
+                            <td>{{ sub.ip | default(sub.ip_address) | default('-') }}</td>
+                            <td>{{ sub.status_code | default('-') }}</td>
+                            <td>{{ sub.source | default('-') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if subdomains|length > 100 %}
+                <p><em>Showing 100 of {{ subdomains|length }} subdomains</em></p>
+            {% endif %}
+        {% else %}
+            <p>No subdomains discovered.</p>
+        {% endif %}
+
+        <!-- Endpoints Section -->
+        <h2>Discovered Endpoints</h2>
+
+        {% if endpoints %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ep in endpoints[:100] %}
+                        <tr>
+                            <td><code>{{ ep.url[:80] }}{% if ep.url|length > 80 %}...{% endif %}</code></td>
+                            <td>{{ ep.method | default('GET') }}</td>
+                            <td>{{ ep.status_code | default('-') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if endpoints|length > 100 %}
+                <p><em>Showing 100 of {{ endpoints|length }} endpoints</em></p>
+            {% endif %}
+        {% else %}
+            <p>No endpoints discovered.</p>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>Generated by <strong>AppSec Bounty Platform</strong></p>
+        <div class="warning">
+            This report contains sensitive security information. Handle appropriately and distribute only on a need-to-know basis.
+        </div>
+    </footer>
+</body>
+</html>

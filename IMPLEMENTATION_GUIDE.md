@@ -10,7 +10,7 @@
 | **Phase 3.5** | Advanced Web Vulnerabilities | Completed |
 | **Phase 4** | API & Modern Application Testing | Completed |
 | **Phase 5** | Authentication & Authorization Testing | Completed |
-| **Phase 6** | Reporting & Integration Enhancement | Planned |
+| **Phase 6** | Reporting & Integration Enhancement | Completed |
 
 ---
 
@@ -2397,354 +2397,227 @@ python workflows/auth_testing.py -t https://example.com \
 
 ---
 
-# PHASE 6: Reporting & Integration Enhancement
+# PHASE 6: Reporting & Integration Enhancement [COMPLETED]
 
 ## 6.1 Tool Installation
 
 ```bash
+# Run the setup script
+./scripts/setup_phase6.sh
+
+# Or install manually:
+
 # PDF generation
 pip install reportlab weasyprint
 
 # Database
 pip install sqlalchemy alembic
 
+# Templating and reporting
+pip install jinja2 markdown
+
 # API framework (optional)
 pip install fastapi uvicorn
-
-# Additional reporting
-pip install jinja2 markdown
 ```
 
-## 6.2 Create Enhanced Reporter
+## 6.2 Key Components
 
-### File: `utils/advanced_reporter.py`
-```python
-"""Advanced reporting with PDF generation and database storage."""
-import json
-import os
-from datetime import datetime
-from jinja2 import Template
-import markdown
+### Database Module (`database/`)
+- **models.py**: SQLAlchemy models for Targets, Scans, Findings, Subdomains, Endpoints, Sessions, Reports
+- **manager.py**: DatabaseManager with full CRUD operations, analytics queries, and data export
 
-class AdvancedReporter:
-    def __init__(self, output_dir='./output/reports'):
-        self.output_dir = output_dir
-        os.makedirs(output_dir, exist_ok=True)
-        self.findings = []
+### Reporting Modules (`utils/`)
+- **advanced_reporter.py**: Enhanced reporter with CVSS 3.1 scoring, auto-enrichment from vulnerability mappings
+- **pdf_generator.py**: Professional PDF reports using ReportLab with charts and executive summaries
+- **analytics.py**: Security analytics, trend analysis, period comparison, and security scoring
+- **report_aggregator.py**: Multi-target report aggregation and comparison
 
-    def add_finding(self, title, severity, description, evidence=None,
-                    remediation=None, cvss=None, cwe=None):
-        """Add a security finding."""
-        self.findings.append({
-            'id': len(self.findings) + 1,
-            'title': title,
-            'severity': severity,
-            'description': description,
-            'evidence': evidence,
-            'remediation': remediation,
-            'cvss': cvss,
-            'cwe': cwe,
-            'timestamp': datetime.now().isoformat()
-        })
+### Templates (`templates/reports/`)
+- **report.html**: Full detailed HTML report template
+- **executive_summary.html**: Executive summary template for management
 
-    def generate_executive_summary(self):
-        """Generate executive summary."""
-        severity_counts = {
-            'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0
-        }
+## 6.3 Usage Examples
 
-        for finding in self.findings:
-            sev = finding['severity'].lower()
-            if sev in severity_counts:
-                severity_counts[sev] += 1
-
-        return {
-            'total_findings': len(self.findings),
-            'severity_breakdown': severity_counts,
-            'risk_score': self._calculate_risk_score(severity_counts),
-            'generated_at': datetime.now().isoformat()
-        }
-
-    def _calculate_risk_score(self, severity_counts):
-        """Calculate overall risk score."""
-        weights = {'critical': 10, 'high': 7, 'medium': 4, 'low': 1, 'info': 0}
-        total = sum(severity_counts[s] * weights[s] for s in severity_counts)
-        max_possible = len(self.findings) * 10
-        return round((total / max_possible) * 100, 2) if max_possible > 0 else 0
-
-    def export_json(self, filename=None):
-        """Export findings to JSON."""
-        filename = filename or f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        filepath = os.path.join(self.output_dir, filename)
-
-        report = {
-            'executive_summary': self.generate_executive_summary(),
-            'findings': self.findings
-        }
-
-        with open(filepath, 'w') as f:
-            json.dump(report, f, indent=2)
-
-        return filepath
-
-    def export_html(self, filename=None):
-        """Export findings to HTML."""
-        filename = filename or f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        filepath = os.path.join(self.output_dir, filename)
-
-        template = Template('''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Security Assessment Report</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .critical { color: #d00; background: #fee; }
-        .high { color: #f60; background: #fff3e0; }
-        .medium { color: #fc0; background: #fff8e1; }
-        .low { color: #090; background: #e8f5e9; }
-        .finding { border: 1px solid #ddd; margin: 20px 0; padding: 15px; border-radius: 5px; }
-        .severity { padding: 3px 10px; border-radius: 3px; font-weight: bold; }
-        h1 { color: #333; }
-        .summary { background: #f5f5f5; padding: 20px; border-radius: 5px; }
-    </style>
-</head>
-<body>
-    <h1>Security Assessment Report</h1>
-    <div class="summary">
-        <h2>Executive Summary</h2>
-        <p>Total Findings: {{ summary.total_findings }}</p>
-        <p>Risk Score: {{ summary.risk_score }}%</p>
-        <ul>
-            <li>Critical: {{ summary.severity_breakdown.critical }}</li>
-            <li>High: {{ summary.severity_breakdown.high }}</li>
-            <li>Medium: {{ summary.severity_breakdown.medium }}</li>
-            <li>Low: {{ summary.severity_breakdown.low }}</li>
-        </ul>
-    </div>
-
-    <h2>Findings</h2>
-    {% for finding in findings %}
-    <div class="finding">
-        <h3>{{ finding.id }}. {{ finding.title }}</h3>
-        <span class="severity {{ finding.severity|lower }}">{{ finding.severity }}</span>
-        <p><strong>Description:</strong> {{ finding.description }}</p>
-        {% if finding.evidence %}
-        <p><strong>Evidence:</strong><pre>{{ finding.evidence }}</pre></p>
-        {% endif %}
-        {% if finding.remediation %}
-        <p><strong>Remediation:</strong> {{ finding.remediation }}</p>
-        {% endif %}
-    </div>
-    {% endfor %}
-
-    <footer>
-        <p>Generated: {{ summary.generated_at }}</p>
-    </footer>
-</body>
-</html>
-        ''')
-
-        html = template.render(
-            summary=self.generate_executive_summary(),
-            findings=self.findings
-        )
-
-        with open(filepath, 'w') as f:
-            f.write(html)
-
-        return filepath
-
-    def export_markdown(self, filename=None):
-        """Export findings to Markdown."""
-        filename = filename or f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
-        filepath = os.path.join(self.output_dir, filename)
-
-        summary = self.generate_executive_summary()
-
-        md = f"""# Security Assessment Report
-
-## Executive Summary
-
-- **Total Findings**: {summary['total_findings']}
-- **Risk Score**: {summary['risk_score']}%
-
-### Severity Breakdown
-| Severity | Count |
-|----------|-------|
-| Critical | {summary['severity_breakdown']['critical']} |
-| High | {summary['severity_breakdown']['high']} |
-| Medium | {summary['severity_breakdown']['medium']} |
-| Low | {summary['severity_breakdown']['low']} |
-
-## Findings
-
-"""
-
-        for finding in self.findings:
-            md += f"""### {finding['id']}. {finding['title']}
-
-**Severity**: {finding['severity']}
-
-**Description**: {finding['description']}
-
-"""
-            if finding.get('evidence'):
-                md += f"**Evidence**:\n```\n{finding['evidence']}\n```\n\n"
-
-            if finding.get('remediation'):
-                md += f"**Remediation**: {finding['remediation']}\n\n"
-
-            md += "---\n\n"
-
-        with open(filepath, 'w') as f:
-            f.write(md)
-
-        return filepath
-```
-
-## 6.3 Create Workflow Files
-
-### File: `workflows/advanced_vulns.py`
-```python
-"""Advanced vulnerability testing workflow."""
-import os
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from wrappers.advanced.ssrf_tester import SSRFTester
-from wrappers.advanced.xxe_injector import XXEInjector
-from wrappers.advanced.cors_tester import CORSTester
-from wrappers.advanced.race_condition import RaceConditionTester
-from utils.advanced_reporter import AdvancedReporter
-from utils.oob_callback import OOBCallback
-
-class AdvancedVulnWorkflow:
-    def __init__(self, target, output_dir='./output/advanced'):
-        self.target = target
-        self.output_dir = output_dir
-        self.reporter = AdvancedReporter(output_dir)
-        self.oob = None
-
-    def run_full_scan(self, params=None):
-        """Run all advanced vulnerability tests."""
-        results = {}
-
-        # Start OOB callback server
-        try:
-            self.oob = OOBCallback()
-            callback_url = self.oob.start()
-            print(f"[*] OOB Callback URL: {callback_url}")
-        except Exception as e:
-            print(f"[!] OOB callback not available: {e}")
-            callback_url = None
-
-        # SSRF Testing
-        print("[*] Testing for SSRF...")
-        ssrf = SSRFTester(self.target, self.output_dir)
-        for param in (params or ['url', 'path', 'redirect', 'next']):
-            ssrf_results = ssrf.test_ssrf(self.target, param, callback_url)
-            results[f'ssrf_{param}'] = ssrf_results
-
-            # Add findings
-            for category, tests in ssrf_results.items():
-                if isinstance(tests, list):
-                    for test in tests:
-                        if test.get('potential_vuln'):
-                            self.reporter.add_finding(
-                                f"Potential SSRF via {param}",
-                                "High",
-                                f"SSRF vulnerability detected with payload: {test.get('payload')}",
-                                evidence=str(test)
-                            )
-
-        # XXE Testing
-        print("[*] Testing for XXE...")
-        xxe = XXEInjector(self.target, self.output_dir)
-        xxe_results = xxe.test_xxe(self.target, callback_url)
-        results['xxe'] = xxe_results
-
-        for test in xxe_results:
-            if test.get('potential_vuln'):
-                self.reporter.add_finding(
-                    f"Potential XXE ({test.get('type')})",
-                    "Critical",
-                    "XML External Entity injection detected",
-                    evidence=test.get('response_preview')
-                )
-
-        # CORS Testing
-        print("[*] Testing for CORS misconfiguration...")
-        cors = CORSTester(self.target, self.output_dir)
-        cors_results = cors.test_cors(self.target)
-        results['cors'] = cors_results
-
-        for test in cors_results:
-            if test.get('vulnerability_level') in ['high', 'critical']:
-                self.reporter.add_finding(
-                    "CORS Misconfiguration",
-                    test.get('vulnerability_level').capitalize(),
-                    f"Origin {test.get('origin_tested')} is reflected with credentials",
-                    evidence=str(test)
-                )
-
-        # Race Condition Testing
-        print("[*] Testing for race conditions...")
-        race = RaceConditionTester(self.target, self.output_dir)
-        race_results = race.test_race(self.target)
-        results['race_condition'] = race_results
-
-        if race_results.get('potential_vuln'):
-            self.reporter.add_finding(
-                "Potential Race Condition",
-                "Medium",
-                "Inconsistent responses detected during parallel requests",
-                evidence=str(race_results)
-            )
-
-        # Check OOB interactions
-        if self.oob:
-            print("[*] Checking for OOB interactions...")
-            interactions = self.oob.wait_for_interaction(timeout=10)
-            if interactions:
-                self.reporter.add_finding(
-                    "Out-of-Band Interaction Detected",
-                    "High",
-                    "External callback received indicating blind vulnerability",
-                    evidence=str(interactions)
-                )
-            self.oob.stop()
-
-        # Generate reports
-        print("[*] Generating reports...")
-        self.reporter.export_json()
-        self.reporter.export_html()
-        self.reporter.export_markdown()
-
-        return results
-
-
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='Advanced Vulnerability Scanner')
-    parser.add_argument('--target', '-t', required=True, help='Target URL')
-    parser.add_argument('--output', '-o', default='./output/advanced', help='Output directory')
-    parser.add_argument('--params', '-p', nargs='+', help='Parameters to test')
-
-    args = parser.parse_args()
-
-    workflow = AdvancedVulnWorkflow(args.target, args.output)
-    workflow.run_full_scan(args.params)
-```
-
-## 6.4 Validation
+### Advanced Reporter with CVSS Scoring
 ```bash
-# Test reporting
-python3 -c "from utils.advanced_reporter import AdvancedReporter; r = AdvancedReporter(); print('Reporter OK')"
+# Generate reports with automatic CVSS enrichment
+python -c "
+from utils.advanced_reporter import AdvancedReporter
 
-# Test jinja2
-python3 -c "from jinja2 import Template; print('Jinja2 OK')"
+reporter = AdvancedReporter()
+reporter.set_metadata(target='example.com', title='Security Assessment')
+
+# Findings auto-enriched with CVSS scores
+reporter.add_finding(
+    title='SQL Injection',
+    severity='critical',
+    finding_type='sqli',  # Auto-enriched with CWE-89, CVSS 9.8
+    tool='sqlmap',
+    url='https://example.com/login'
+)
+
+# Export all formats
+paths = reporter.export_all()
+print(paths)
+"
 ```
+
+### PDF Report Generation
+```bash
+# Generate professional PDF report
+python -c "
+from utils.pdf_generator import PDFReportGenerator
+
+generator = PDFReportGenerator()
+report_data = {
+    'title': 'Security Assessment',
+    'target': 'example.com',
+    'summary': {'severity_breakdown': {'critical': 1, 'high': 2}, 'total_findings': 3},
+    'findings': [{'title': 'SQL Injection', 'severity': 'critical'}]
+}
+path = generator.generate(report_data)
+print(f'PDF generated: {path}')
+"
+```
+
+### Database Storage
+```bash
+# Store and query scan results
+python -c "
+from database.manager import DatabaseManager
+
+db = DatabaseManager()
+
+# Create target
+target = db.create_target('Example Corp', 'example.com')
+
+# Create scan
+scan = db.create_scan(target['id'], 'vulnerability_scan')
+db.start_scan(scan['id'], tools=['nuclei', 'sqlmap'])
+
+# Add findings
+db.add_finding(scan['id'], 'SQL Injection', 'critical', finding_type='sqli')
+
+# Complete scan
+db.complete_scan(scan['id'])
+
+# Get statistics
+stats = db.get_summary_stats(target_id=target['id'])
+print(stats)
+"
+```
+
+### Analytics and Trends
+```bash
+# Generate security analytics
+python -c "
+from utils.analytics import SecurityAnalytics
+
+analytics = SecurityAnalytics()
+
+scans = [{'findings_count': 5, 'risk_score': 75, 'created_at': '2024-01-01'}]
+findings = [{'severity': 'critical', 'finding_type': 'sqli'}]
+
+report_data = analytics.generate_report_data(scans, findings)
+print(f'Risk Score: {report_data[\"security_score\"][\"score\"]}')
+print(f'Grade: {report_data[\"security_score\"][\"grade\"]}')
+"
+```
+
+### Multi-Target Aggregation
+```bash
+# Aggregate reports from multiple targets
+python -c "
+from utils.report_aggregator import ReportAggregator
+
+aggregator = ReportAggregator()
+
+# Add results from multiple targets
+aggregator.add_scan_results('target1.com', scan={}, findings=[{'severity': 'high'}])
+aggregator.add_scan_results('target2.com', scan={}, findings=[{'severity': 'critical'}])
+
+# Generate aggregated report
+paths = aggregator.export_all()
+print(paths)
+"
+```
+
+### Scan Comparison
+```bash
+# Compare two scans
+python -c "
+from utils.analytics import ComparisonReport
+
+comparison = ComparisonReport()
+
+scan1 = {'id': 1, 'findings': [{'title': 'XSS', 'severity': 'high'}]}
+scan2 = {'id': 2, 'findings': [{'title': 'XSS', 'severity': 'high'}, {'title': 'SQLi', 'severity': 'critical'}]}
+
+result = comparison.compare_scans(scan1, scan2)
+print(f'New findings: {result[\"comparison\"][\"new_findings\"]}')
+print(f'Resolved: {result[\"comparison\"][\"resolved_findings\"]}')
+"
+```
+
+## 6.4 CLI Commands
+
+```bash
+# Advanced Reporter CLI
+python utils/advanced_reporter.py
+
+# PDF Generator test
+python utils/pdf_generator.py
+
+# Analytics test
+python utils/analytics.py
+
+# Aggregator test
+python utils/report_aggregator.py
+
+# Database initialization
+python -c "from database.models import init_db; init_db()"
+```
+
+## 6.5 Validation
+```bash
+# Run full Phase 6 validation
+python scripts/validate_phase6.py
+
+# Quick checks
+python3 -c "from utils.advanced_reporter import AdvancedReporter; print('Reporter OK')"
+python3 -c "from utils.pdf_generator import PDFReportGenerator; print('PDF Generator OK')"
+python3 -c "from database.manager import DatabaseManager; print('Database OK')"
+python3 -c "from utils.analytics import SecurityAnalytics; print('Analytics OK')"
+python3 -c "from utils.report_aggregator import ReportAggregator; print('Aggregator OK')"
+```
+
+## 6.6 Features Summary
+
+### Report Formats
+- **HTML**: Professional dark-themed reports with interactive styling
+- **PDF**: ReportLab-generated reports with charts and tables
+- **JSON**: Machine-readable structured data
+- **Markdown**: Documentation-friendly format
+
+### Database Features
+- SQLite storage (default) with SQLAlchemy ORM
+- Full CRUD operations for all entities
+- Deduplication of findings by hash
+- Analytics queries and trend data
+- Data export functionality
+
+### Analytics Features
+- Severity breakdown and risk scoring
+- Trend analysis over time
+- Period comparison
+- Security grade calculation (A+ to F)
+- Vulnerability insights and recommendations
+
+### CVSS 3.1 Scoring
+- Automatic CVSS calculation from vector components
+- Pre-defined mappings for common vulnerability types
+- CWE ID auto-enrichment
+- Remediation suggestions
 
 ---
 

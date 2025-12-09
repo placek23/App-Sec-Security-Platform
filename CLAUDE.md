@@ -169,6 +169,33 @@ python wrappers/auth/hydra_wrapper.py -t 192.168.1.1 -s ssh -l admin -P password
 python wrappers/auth/hydra_wrapper.py -t example.com -s http-post-form --form-path "/login" --form-data "user=^USER^&pass=^PASS^" --fail-string "Invalid"
 ```
 
+### Reporting & Integration (Phase 6)
+```bash
+# Advanced Reporter with CVSS Scoring
+python -c "
+from utils.advanced_reporter import AdvancedReporter
+reporter = AdvancedReporter(output_dir='./output/reports')
+reporter.set_metadata(title='Security Assessment', target='example.com', tester='Security Team')
+reporter.add_finding(title='SQL Injection', severity='critical', finding_type='sqli', tool='sqlmap', url='https://example.com/login')
+reporter.export_all('example_report')
+"
+
+# PDF Report Generation
+python utils/pdf_generator.py  # Demo mode - generates sample report
+
+# Database Operations
+python database/manager.py  # Demo mode - tests CRUD operations
+
+# Analytics and Trends
+python utils/analytics.py  # Demo mode - tests analytics functions
+
+# Report Aggregation for Multiple Targets
+python utils/report_aggregator.py  # Demo mode - tests aggregation
+
+# Validate Phase 6 Installation
+python scripts/validate_phase6.py
+```
+
 ### Vulnerability Scanning & Testing
 ```bash
 python workflows/full_recon.py --target example.com
@@ -190,6 +217,7 @@ pip install -r requirements.txt
 ./scripts/setup_phase2.sh  # Install Phase 2 tools (ZAP, mitmproxy, etc.)
 ./scripts/setup_phase3.sh  # Install Phase 3 tools (Advanced injection testing)
 ./scripts/setup_phase4.sh  # Install Phase 4 tools (API testing)
+./scripts/setup_phase6.sh  # Install Phase 6 dependencies (ReportLab, SQLAlchemy, etc.)
 ```
 
 ### Validate Installation
@@ -198,6 +226,7 @@ python scripts/validate_phase1.py
 python scripts/validate_phase2.py
 python scripts/validate_phase3.py
 python scripts/validate_phase4.py
+python scripts/validate_phase6.py
 python scripts/test_phase1.py
 ```
 
@@ -289,6 +318,13 @@ Each wrapper must implement:
 - `SessionManager` (`wrappers/proxy/session_manager.py`): Session/token management for JWT, API keys, Basic auth with persistence
 - `PayloadEncoder` (`utils/encoder.py`): Encoding utilities (URL, Base64, HTML, Unicode, Hex) with XSS/SQL bypass variants
 
+**Phase 6 - Reporting & Integration**:
+- `AdvancedReporter` (`utils/advanced_reporter.py`): Enhanced reporter with CVSS 3.1 scoring, vulnerability mappings, and multi-format export
+- `PDFReportGenerator` (`utils/pdf_generator.py`): Professional PDF reports with charts, severity breakdowns, and executive summaries
+- `DatabaseManager` (`database/manager.py`): SQLAlchemy-based persistence with CRUD operations for targets, scans, and findings
+- `SecurityAnalytics` (`utils/analytics.py`): Trend analysis, period comparisons, and security score calculations
+- `ReportAggregator` (`utils/report_aggregator.py`): Multi-target report aggregation with deduplication and risk scoring
+
 ### Configuration
 
 `config/tools.json` contains:
@@ -313,6 +349,8 @@ All output goes to `./output/` by default:
 - `output/zap/` - ZAP scan reports (HTML, JSON, XML)
 - `output/sessions/` - Session and token storage for manual testing
 - `output/proxy/` - Request/response history exports
+- `output/reports/` - Generated reports (PDF, HTML, JSON, Markdown)
+- `output/appsec_bounty.db` - SQLite database for scan persistence
 
 ## External Tool Requirements
 
@@ -344,9 +382,7 @@ This platform wraps external security tools that must be installed separately:
 - **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)
 - **Phase 4**: API & Modern Application Testing (Kiterunner, GraphQL, WebSocket, OpenAPI, JWT)
 - **Phase 5**: Authentication & Authorization Testing (Auth bypass, IDOR, JWT attacks, Privilege Escalation, Hydra)
-
-### Planned
-- **Phase 6**: Reporting & Integration Enhancement (PDF reports, database storage, advanced analytics)
+- **Phase 6**: Reporting & Integration Enhancement (PDF reports, database storage, CVSS scoring, analytics, multi-target aggregation)
 
 ## Legal Notice
 

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Summary - {{ metadata.target | default('Security Assessment') }}</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --accent: #e94560;
+            --critical: #ff0054;
+            --high: #ff6b6b;
+            --medium: #feca57;
+            --low: #48dbfb;
+            --info: #1dd1a1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fff;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .risk-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #0f3460 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .risk-box .rating {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .risk-box .rating.critical { color: var(--critical); }
+        .risk-box .rating.high { color: var(--high); }
+        .risk-box .rating.medium { color: var(--medium); }
+        .risk-box .rating.low { color: var(--low); }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-card.critical { border-color: var(--critical); }
+        .stat-card.high { border-color: var(--high); }
+        .stat-card.medium { border-color: var(--medium); }
+        .stat-card.low { border-color: var(--low); }
+        .stat-card.info { border-color: var(--info); }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-card.critical .number { color: var(--critical); }
+        .stat-card.high .number { color: var(--high); }
+        .stat-card.medium .number { color: var(--medium); }
+        .stat-card.low .number { color: var(--low); }
+        .stat-card.info .number { color: var(--info); }
+
+        .stat-card .label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        section {
+            margin: 40px 0;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .key-finding {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .key-finding h3 {
+            color: var(--primary);
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .key-finding .severity {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+        }
+
+        .key-finding .severity.critical { background: var(--critical); }
+        .key-finding .severity.high { background: var(--high); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .recommendation {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .recommendation h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+
+        @media print {
+            body { font-size: 11pt; }
+            .container { max-width: 100%; padding: 20px; }
+            .risk-box { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Executive Security Summary</h1>
+            <p class="subtitle">{{ metadata.target | default('Target Assessment') }}</p>
+            <p class="subtitle" style="font-size: 0.9em; margin-top: 10px;">{{ summary.generated_at | default(now()) }}</p>
+        </header>
+
+        <div class="risk-box">
+            <div class="rating {{ summary.risk_rating | lower }}">{{ summary.risk_rating | upper }}</div>
+            <div>Overall Security Risk</div>
+            <div style="margin-top: 15px; opacity: 0.9;">
+                Risk Score: {{ summary.risk_score }}% | Average CVSS: {{ summary.average_cvss }}
+            </div>
+        </div>
+
+        <div class="summary-stats">
+            <div class="stat-card critical">
+                <div class="number">{{ summary.severity_breakdown.critical }}</div>
+                <div class="label">Critical</div>
+            </div>
+            <div class="stat-card high">
+                <div class="number">{{ summary.severity_breakdown.high }}</div>
+                <div class="label">High</div>
+            </div>
+            <div class="stat-card medium">
+                <div class="number">{{ summary.severity_breakdown.medium }}</div>
+                <div class="label">Medium</div>
+            </div>
+            <div class="stat-card low">
+                <div class="number">{{ summary.severity_breakdown.low }}</div>
+                <div class="label">Low</div>
+            </div>
+            <div class="stat-card info">
+                <div class="number">{{ summary.severity_breakdown.info }}</div>
+                <div class="label">Info</div>
+            </div>
+        </div>
+
+        <section>
+            <h2>Assessment Overview</h2>
+            <table>
+                <tr>
+                    <td><strong>Target</strong></td>
+                    <td>{{ metadata.target | default('N/A') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Findings</strong></td>
+                    <td>{{ summary.total_findings }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Subdomains Discovered</strong></td>
+                    <td>{{ summary.total_subdomains }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Endpoints Discovered</strong></td>
+                    <td>{{ summary.total_endpoints }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Verified Findings</strong></td>
+                    <td>{{ summary.verified_findings }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Assessment By</strong></td>
+                    <td>{{ metadata.tester | default('AppSec Bounty Platform') }}</td>
+                </tr>
+            </table>
+        </section>
+
+        {% if grouped_findings.critical or grouped_findings.high %}
+        <section>
+            <h2>Critical & High Priority Findings</h2>
+
+            {% for finding in grouped_findings.critical %}
+                <div class="key-finding">
+                    <span class="severity critical">CRITICAL</span>
+                    <h3>{{ finding.title }}</h3>
+                    <p>{{ finding.description or 'See full report for details.' }}</p>
+                    {% if finding.cvss_score %}
+                        <p><small>CVSS Score: {{ finding.cvss_score }}</small></p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% for finding in grouped_findings.high %}
+                <div class="key-finding">
+                    <span class="severity high">HIGH</span>
+                    <h3>{{ finding.title }}</h3>
+                    <p>{{ finding.description or 'See full report for details.' }}</p>
+                    {% if finding.cvss_score %}
+                        <p><small>CVSS Score: {{ finding.cvss_score }}</small></p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <section>
+            <h2>Key Recommendations</h2>
+
+            <div class="recommendation">
+                <h3>Immediate Actions Required</h3>
+                <ul>
+                    {% if summary.severity_breakdown.critical > 0 %}
+                        <li>Address all {{ summary.severity_breakdown.critical }} critical findings immediately</li>
+                    {% endif %}
+                    {% if summary.severity_breakdown.high > 0 %}
+                        <li>Prioritize remediation of {{ summary.severity_breakdown.high }} high severity issues</li>
+                    {% endif %}
+                    <li>Review and validate all findings with the development team</li>
+                    <li>Implement suggested remediation measures</li>
+                    <li>Schedule follow-up assessment after fixes are deployed</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer>
+            <p>This executive summary was generated by <strong>AppSec Bounty Platform</strong></p>
+            <p><small>For detailed technical information, refer to the full security assessment report.</small></p>
+        </footer>
+    </div>
+</body>
+</html>
