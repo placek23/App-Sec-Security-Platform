@@ -37,6 +37,9 @@ pip install pyjwt python-jose
 pip install aiohttp websocket-client websockets
 pip install reportlab weasyprint sqlalchemy jinja2
 
+# Optional: Enhanced technology fingerprinting (Wappalyzer - 2000+ signatures)
+pip install python-Wappalyzer setuptools
+
 # Run phase-specific setup scripts
 ./scripts/setup_phase1.sh
 ./scripts/setup_phase2.sh
@@ -112,10 +115,19 @@ python agents/vuln_scanner.py -t https://example.com --rate 20
 # ─────────────────────────────────────────────────────────────────────────────────
 
 # === PASSIVE RECONNAISSANCE WORKFLOW ===
-# Safe for pre-engagement - No direct target interaction
+# Safe for pre-engagement - Minimal direct target interaction
 
-# Full passive recon
+# Full passive recon (includes technology fingerprinting)
 python workflows/passive_recon.py -d example.com
+
+# Fully passive mode (no target requests)
+python workflows/passive_recon.py -d example.com --skip-fingerprint
+
+# Fingerprint specific URL
+python workflows/passive_recon.py -d example.com -u https://example.com/app
+
+# Skip Wayback Machine (faster)
+python workflows/passive_recon.py -d example.com --skip-wayback
 
 # With specific output directory
 python workflows/passive_recon.py -d example.com -o ./output/passive_example
@@ -253,6 +265,22 @@ python wrappers/passive/osint_search.py -d example.com
 python wrappers/passive/osint_search.py -d example.com --google-dorks
 python wrappers/passive/osint_search.py -d example.com --github-dorks
 python wrappers/passive/osint_search.py -d example.com -o osint_results.json
+
+# === TECHNOLOGY FINGERPRINTING (Wappalyzer-style) ===
+# Detects web servers, frameworks, CMS, CDN, analytics, security tools, etc.
+# Makes a single HTTP request like a normal browser visit
+# Results auto-saved to ./output/tech_fingerprint/<domain>_<timestamp>.json
+# Engines: builtin (~80 signatures), wappalyzer (2000+ signatures), both
+
+python wrappers/passive/tech_fingerprint.py -u https://example.com                      # Auto-saves (builtin engine)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine wappalyzer  # Wappalyzer engine
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine both        # Both engines combined
+python wrappers/passive/tech_fingerprint.py -u https://example.com -o tech_results.json # Custom output file
+python wrappers/passive/tech_fingerprint.py -u example.com --no-favicon                 # Skip favicon hash
+python wrappers/passive/tech_fingerprint.py -u https://example.com --no-save            # Don't save (display only)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --json               # JSON output only
+python wrappers/passive/tech_fingerprint.py -u https://example.com --timeout 30         # Custom timeout
+python wrappers/passive/tech_fingerprint.py -u https://example.com --signatures custom_sigs.json
 
 
 # ─────────────────────────────────────────────────────────────────────────────────
@@ -876,11 +904,16 @@ python workflows/vuln_scan.py --targets output/live_hosts.txt
 python workflows/injection_test.py --urls output/urls_with_params.txt
 
 # === WORKFLOW 3: Stealth Reconnaissance ===
-# 100% Passive - No direct target contact
-python workflows/passive_recon.py -d target.com
+# Fully passive - No direct target contact
+python workflows/passive_recon.py -d target.com --skip-fingerprint
 python wrappers/passive/cert_transparency.py -d target.com
 python wrappers/passive/wayback.py -d target.com
 python wrappers/passive/osint_search.py -d target.com --google-dorks
+
+# === WORKFLOW 3b: Tech-Enhanced Passive Recon ===
+# Single request to target for technology detection
+python workflows/passive_recon.py -d target.com
+python wrappers/passive/tech_fingerprint.py -u https://target.com -o tech.json
 
 # === WORKFLOW 4: Full Autonomous Hunt ===
 python agents/bounty_hunter.py --target target.com --scope "*.target.com" --severity medium --max-time 7200
@@ -914,6 +947,10 @@ python wrappers/advanced/xxe_injector.py -u "https://target.com/api/xml"
 #   - whois_info.json         (WHOIS data)
 #   - wayback_urls.txt        (Wayback Machine URLs)
 #   - osint_results.json      (OSINT/dork results)
+#   - tech_fingerprint.json   (technology detection - in workflow)
+#
+# Technology Fingerprinting (standalone):
+#   - output/tech_fingerprint/<domain>_<timestamp>.json
 #
 # Active Reconnaissance:
 #   - subdomains.txt          (discovered subdomains)

@@ -78,7 +78,13 @@ Before using the platform, ensure you have:
    ./scripts/setup_phase6.sh   # Reporting
    ```
 
-4. **Validate installation:**
+4. **Optional: Install Wappalyzer for enhanced technology detection:**
+   ```bash
+   pip install python-Wappalyzer setuptools
+   ```
+   This enables the `--engine wappalyzer` option with 2000+ technology signatures.
+
+5. **Validate installation:**
    ```bash
    python validate.py
    python scripts/validate_phase1.py
@@ -95,14 +101,22 @@ python agents/bounty_hunter.py --target example.com --scope "*.example.com"
 
 **Option 2: Step-by-Step Manual Workflow**
 ```bash
-# 1. Passive recon (safe, no target contact)
+# 1. Passive recon (minimal target contact)
 python workflows/passive_recon.py -d example.com
 
-# 2. Active recon (requires authorization)
+# 2. Quick technology check (single request)
+python wrappers/passive/tech_fingerprint.py -u https://example.com
+
+# 3. Active recon (requires authorization)
 python workflows/full_recon.py --target example.com
 
-# 3. Vulnerability scanning
+# 4. Vulnerability scanning
 python workflows/vuln_scan.py --targets output/live_hosts.txt
+```
+
+**Option 3: Fully Passive (No Target Contact)**
+```bash
+python workflows/passive_recon.py -d example.com --skip-fingerprint
 ```
 
 ---
@@ -148,6 +162,7 @@ appsec-bounty-platform/
 │   └── manager.py         # Database operations
 ├── config/                # Configuration files
 │   ├── tools.json         # Tool settings
+│   ├── tech_signatures.json # Technology fingerprint patterns
 │   ├── wordlists/         # Fuzzing wordlists
 │   └── payloads/          # Attack payloads
 ├── output/                # Scan results (auto-created)
@@ -158,7 +173,7 @@ appsec-bounty-platform/
 
 | Category | Purpose | Example Tools |
 |----------|---------|---------------|
-| Passive | No target contact | DNS enum, CT logs, WHOIS, Wayback |
+| Passive | Minimal target contact | DNS enum, CT logs, WHOIS, Wayback, Tech Fingerprint |
 | Recon | Subdomain/endpoint discovery | Subfinder, Amass, Httpx, Katana |
 | Discovery | Content/parameter discovery | Gobuster, Dirsearch, Arjun, LinkFinder |
 | Scanning | Vulnerability detection | Nuclei, WhatWeb, Wafw00f |
@@ -172,7 +187,7 @@ appsec-bounty-platform/
 
 ## Passive Reconnaissance
 
-Passive reconnaissance gathers information without directly contacting the target. This is safe for pre-engagement research and scoping.
+Passive reconnaissance gathers information with minimal or no direct target contact. Most tools query public databases only. Technology fingerprinting makes a single request (like a normal browser visit).
 
 ### When to Use
 
@@ -180,6 +195,7 @@ Passive reconnaissance gathers information without directly contacting the targe
 - Scoping a bug bounty program
 - Gathering background intelligence
 - Building a target profile
+- Identifying technology stack for targeted testing
 
 ### Available Tools
 
@@ -218,14 +234,76 @@ python wrappers/passive/osint_search.py -d example.com --google-dorks
 python wrappers/passive/osint_search.py -d example.com --github-dorks
 ```
 
+#### Technology Fingerprinting
+Detect web technologies, frameworks, CMS, CDN, and more (Wappalyzer-style):
+```bash
+# Basic fingerprinting - auto-saves to ./output/tech_fingerprint/
+python wrappers/passive/tech_fingerprint.py -u https://example.com
+
+# Use Wappalyzer engine (2000+ technology signatures)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine wappalyzer
+
+# Use both engines for maximum coverage
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine both
+
+# Custom output file
+python wrappers/passive/tech_fingerprint.py -u https://example.com -o tech.json
+
+# Skip favicon hash (faster)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --no-favicon
+
+# Don't save results (display only)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --no-save
+
+# JSON output only (still auto-saves)
+python wrappers/passive/tech_fingerprint.py -u https://example.com --json
+```
+
+**Detection Engines:**
+- `builtin` (default) - Built-in engine with ~80 signatures, no extra dependencies
+- `wappalyzer` - Official Wappalyzer library with 2000+ technology signatures (requires `pip install python-Wappalyzer`)
+- `both` - Run both engines for maximum coverage, shows `[W]`/`[B]` tags to indicate source
+
+Results are automatically saved to `./output/tech_fingerprint/<domain>_<timestamp>.json`
+
+**What it detects:**
+- Web servers (Nginx, Apache, IIS, LiteSpeed)
+- Languages/Frameworks (PHP, ASP.NET, Python/Django, Ruby/Rails, Node.js)
+- JavaScript frameworks (React, Vue, Angular, Next.js, Nuxt.js)
+- CSS frameworks (Bootstrap, Tailwind, Bulma)
+- CMS (WordPress, Drupal, Joomla, Ghost)
+- E-commerce (Shopify, Magento, WooCommerce)
+- CDN/Security (Cloudflare, Fastly, Akamai, AWS CloudFront)
+- Analytics (Google Analytics, GTM, Hotjar, Mixpanel)
+- Widgets (Stripe, PayPal, reCAPTCHA, Intercom)
+
 ### Full Passive Workflow
 
 Run all passive tools in one command:
 ```bash
+# Full passive recon (includes tech fingerprinting)
 python workflows/passive_recon.py -d example.com
+
+# Fully passive mode (no target requests at all)
+python workflows/passive_recon.py -d example.com --skip-fingerprint
+
+# Fingerprint a specific URL
+python workflows/passive_recon.py -d example.com -u https://example.com/app
+
+# Skip Wayback Machine (faster)
+python workflows/passive_recon.py -d example.com --skip-wayback
 ```
 
-Output is saved to `output/passive_example.com/`
+Output is saved to `output/passive_<timestamp>/` including:
+- `dns_results.json` - DNS enumeration
+- `cert_results.json` - Certificate Transparency
+- `whois_results.json` - WHOIS data
+- `wayback_results.json` - Historical URLs
+- `osint_results.json` - OSINT/dorks
+- `tech_fingerprint.json` - Technology detection
+- `full_results.json` - Combined results
+
+**Standalone fingerprinting** saves to `output/tech_fingerprint/<domain>_<timestamp>.json`
 
 ---
 
@@ -380,6 +458,16 @@ python wrappers/scanning/nuclei.py -u https://example.com --profile wordpress
 python wrappers/scanning/nuclei.py -u https://example.com --profile joomla
 python wrappers/scanning/nuclei.py -u https://example.com --profile drupal
 ```
+
+> **Tip**: Use technology fingerprinting first to identify the CMS/framework, then choose the appropriate Nuclei profile:
+> ```bash
+> # 1. Identify technologies
+> python wrappers/passive/tech_fingerprint.py -u https://example.com
+> # Output shows: WordPress detected
+>
+> # 2. Run targeted scan
+> python wrappers/scanning/nuclei.py -u https://example.com --profile wordpress
+> ```
 
 ### WAF Detection
 
@@ -901,7 +989,8 @@ python agents/vuln_scanner.py -f urls.txt --type full --severity high,critical
 1. **Get Authorization**: Always have written permission before testing
 2. **Define Scope**: Know what's in-scope and out-of-scope
 3. **Start Passive**: Run passive recon first to understand the target
-4. **Check Rate Limits**: Respect program rate limits to avoid bans
+4. **Fingerprint Technologies**: Use tech fingerprinting to identify the stack and choose appropriate tools
+5. **Check Rate Limits**: Respect program rate limits to avoid bans
 
 ### During Testing
 

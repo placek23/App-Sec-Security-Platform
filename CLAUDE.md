@@ -14,10 +14,16 @@ python agents/bounty_hunter.py --target example.com
 python agents/bounty_hunter.py --target example.com --scope "*.example.com" --severity high --max-time 1800
 ```
 
-### Passive Reconnaissance (No Direct Target Interaction)
+### Passive Reconnaissance (Minimal Target Interaction)
 ```bash
-# Full passive recon - safe for pre-engagement research
+# Full passive recon - includes technology fingerprinting
 python workflows/passive_recon.py -d example.com
+
+# Fully passive (no target requests)
+python workflows/passive_recon.py -d example.com --skip-fingerprint
+
+# Fingerprint specific URL
+python workflows/passive_recon.py -d example.com -u https://example.com/app
 
 # Individual passive tools
 python wrappers/passive/dns_enum.py -d example.com
@@ -25,6 +31,16 @@ python wrappers/passive/cert_transparency.py -d example.com
 python wrappers/passive/whois_lookup.py -d example.com
 python wrappers/passive/wayback.py -d example.com
 python wrappers/passive/osint_search.py -d example.com --google-dorks
+
+# Technology Fingerprinting (Wappalyzer-style detection)
+# Results auto-saved to ./output/tech_fingerprint/<domain>_<timestamp>.json
+# Engines: builtin (default), wappalyzer (2000+ signatures), both
+python wrappers/passive/tech_fingerprint.py -u https://example.com
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine wappalyzer
+python wrappers/passive/tech_fingerprint.py -u https://example.com --engine both
+python wrappers/passive/tech_fingerprint.py -u https://example.com -o tech.json
+python wrappers/passive/tech_fingerprint.py -u example.com --no-favicon
+python wrappers/passive/tech_fingerprint.py -u example.com --no-save  # Don't save
 ```
 
 ### Active Web Discovery (Phase 1)
@@ -218,6 +234,9 @@ pip install -r requirements.txt
 ./scripts/setup_phase3.sh  # Install Phase 3 tools (Advanced injection testing)
 ./scripts/setup_phase4.sh  # Install Phase 4 tools (API testing)
 ./scripts/setup_phase6.sh  # Install Phase 6 dependencies (ReportLab, SQLAlchemy, etc.)
+
+# Optional: Enhanced technology fingerprinting with Wappalyzer (2000+ signatures)
+pip install python-Wappalyzer setuptools
 ```
 
 ### Validate Installation
@@ -236,12 +255,13 @@ python scripts/test_phase1.py
 
 All tool wrappers inherit from `BaseToolWrapper` in `utils/base_wrapper.py`. Category-specific base classes exist:
 
-**Passive Tools** (No direct target interaction):
+**Passive Tools** (No/minimal direct target interaction):
 - `DNSEnumerator` - DNS records via public DNS servers
 - `CertTransparency` - Certificate Transparency log analysis
 - `WhoisLookup` - WHOIS database queries
 - `WaybackMachine` - Internet Archive historical data
 - `OSINTSearch` - Google/GitHub dorks, social media search
+- `TechFingerprinter` - Technology detection (single request, Wappalyzer-style)
 
 **Active Tools** (Direct target interaction):
 - `ReconTool` - reconnaissance tools (subfinder, amass, httpx, katana, gau)
@@ -274,10 +294,10 @@ Each wrapper must implement:
 ```
                     ┌─────────────────────────────────────────┐
                     │           PASSIVE RECON                 │
-                    │  (Safe - No Target Interaction)         │
+                    │  (Safe - Minimal Target Interaction)    │
                     │                                         │
                     │  DNS Enum → CT Logs → WHOIS →          │
-                    │  Wayback → OSINT Dorks                  │
+                    │  Wayback → OSINT → Tech Fingerprint    │
                     └────────────────┬────────────────────────┘
                                      │
                                      ▼
@@ -295,6 +315,7 @@ Each wrapper must implement:
 3. WHOIS registration data
 4. Wayback Machine historical URLs
 5. OSINT search and dork generation
+6. Technology fingerprinting (single request - detects servers, frameworks, CMS, CDN, etc.)
 
 **Active Phases** (Requires authorization):
 1. **Reconnaissance**: subfinder + amass (subdomains) → httpx (probing) → katana + gau (crawling)
@@ -306,7 +327,7 @@ Each wrapper must implement:
 ### Key Classes
 
 **Workflows & Agents**:
-- `PassiveReconWorkflow` (`workflows/passive_recon.py`): Combines all passive OSINT tools for comprehensive reconnaissance without target interaction
+- `PassiveReconWorkflow` (`workflows/passive_recon.py`): Combines all passive OSINT tools + technology fingerprinting for comprehensive reconnaissance
 - `WebDiscoveryWorkflow` (`workflows/web_discovery.py`): Runs directory discovery, JS analysis, and screenshot capture
 - `BountyHunterAgent` (`agents/bounty_hunter.py`): Orchestrates the complete multi-phase pipeline with scope filtering, timeout management, and report generation
 - `FullReconWorkflow` (`workflows/full_recon.py`): Runs parallel subdomain discovery, HTTP probing, crawling, and URL harvesting
@@ -337,10 +358,16 @@ Each wrapper must implement:
 - `common.txt` - Common directory/file names
 - `medium.txt` - Extended wordlist for thorough discovery
 
+`config/tech_signatures.json` contains:
+- Technology detection patterns (headers, HTML, meta tags, scripts, cookies)
+- 80+ technology signatures (servers, frameworks, CMS, CDN, analytics, etc.)
+- Favicon hash database for fingerprinting
+
 ### Output Structure
 
 All output goes to `./output/` by default:
-- `output/passive_*/` - Passive recon results (subdomains, URLs, parameters, dorks)
+- `output/passive_*/` - Passive recon results (subdomains, URLs, parameters, dorks, tech fingerprint)
+- `output/tech_fingerprint/` - Standalone tech fingerprinting results (`<domain>_<timestamp>.json`)
 - `output/discovery/` - Directory brute force, JS endpoints, secrets, screenshots
 - `output/recon/` - Subdomains, live hosts, endpoints
 - `output/scanning/` - Nuclei findings, WAF info
@@ -376,7 +403,7 @@ This platform wraps external security tools that must be installed separately:
 
 ### Completed
 - **Phase 1**: Web Discovery & Reconnaissance (Gobuster, Dirsearch, LinkFinder, SecretFinder, GoWitness)
-- **Passive Recon**: DNS enumeration, CT logs, WHOIS, Wayback Machine, OSINT/dorks
+- **Passive Recon**: DNS enumeration, CT logs, WHOIS, Wayback Machine, OSINT/dorks, Technology Fingerprinting
 - **Phase 2**: Manual Testing Support & Proxy Integration (ZAP, RequestBuilder, SessionManager, PayloadEncoder)
 - **Phase 3**: Advanced Injection Testing (NoSQL, LDAP, XPath injection + Advanced XSS with DOM/CSP bypass)
 - **Phase 3.5**: Advanced Web Vulnerabilities (SSRF, XXE, HTTP Smuggling, Race Conditions, CORS, File Upload)

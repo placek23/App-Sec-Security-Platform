@@ -1,0 +1,1142 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Technology fingerprinting signatures for passive detection",
+    "last_updated": "2025-01-01"
+  },
+  "categories": {
+    "web_servers": {
+      "description": "Web server software",
+      "color": "#3498db"
+    },
+    "programming_languages": {
+      "description": "Server-side programming languages",
+      "color": "#e74c3c"
+    },
+    "javascript_frameworks": {
+      "description": "Frontend JavaScript frameworks",
+      "color": "#f1c40f"
+    },
+    "css_frameworks": {
+      "description": "CSS frameworks and libraries",
+      "color": "#9b59b6"
+    },
+    "cms": {
+      "description": "Content Management Systems",
+      "color": "#2ecc71"
+    },
+    "ecommerce": {
+      "description": "E-commerce platforms",
+      "color": "#e67e22"
+    },
+    "cdn": {
+      "description": "Content Delivery Networks",
+      "color": "#1abc9c"
+    },
+    "analytics": {
+      "description": "Analytics and tracking",
+      "color": "#34495e"
+    },
+    "security": {
+      "description": "Security tools and WAFs",
+      "color": "#c0392b"
+    },
+    "caching": {
+      "description": "Caching systems",
+      "color": "#16a085"
+    },
+    "databases": {
+      "description": "Database systems",
+      "color": "#8e44ad"
+    },
+    "javascript_libraries": {
+      "description": "JavaScript libraries",
+      "color": "#d35400"
+    },
+    "hosting": {
+      "description": "Hosting providers and platforms",
+      "color": "#27ae60"
+    },
+    "widgets": {
+      "description": "Third-party widgets and services",
+      "color": "#7f8c8d"
+    }
+  },
+  "technologies": {
+    "nginx": {
+      "name": "Nginx",
+      "category": "web_servers",
+      "website": "https://nginx.org",
+      "detection": {
+        "headers": {
+          "Server": "nginx"
+        }
+      }
+    },
+    "apache": {
+      "name": "Apache",
+      "category": "web_servers",
+      "website": "https://httpd.apache.org",
+      "detection": {
+        "headers": {
+          "Server": "Apache"
+        }
+      }
+    },
+    "iis": {
+      "name": "Microsoft IIS",
+      "category": "web_servers",
+      "website": "https://www.iis.net",
+      "detection": {
+        "headers": {
+          "Server": "Microsoft-IIS",
+          "X-Powered-By": "ASP.NET"
+        }
+      }
+    },
+    "lighttpd": {
+      "name": "Lighttpd",
+      "category": "web_servers",
+      "website": "https://www.lighttpd.net",
+      "detection": {
+        "headers": {
+          "Server": "lighttpd"
+        }
+      }
+    },
+    "litespeed": {
+      "name": "LiteSpeed",
+      "category": "web_servers",
+      "website": "https://www.litespeedtech.com",
+      "detection": {
+        "headers": {
+          "Server": "LiteSpeed"
+        }
+      }
+    },
+    "caddy": {
+      "name": "Caddy",
+      "category": "web_servers",
+      "website": "https://caddyserver.com",
+      "detection": {
+        "headers": {
+          "Server": "Caddy"
+        }
+      }
+    },
+    "openresty": {
+      "name": "OpenResty",
+      "category": "web_servers",
+      "website": "https://openresty.org",
+      "detection": {
+        "headers": {
+          "Server": "openresty"
+        }
+      }
+    },
+    "php": {
+      "name": "PHP",
+      "category": "programming_languages",
+      "website": "https://php.net",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "PHP",
+          "Set-Cookie": "PHPSESSID"
+        },
+        "html": [
+          "<\\?php",
+          "\\.php[\"'\\s>?]"
+        ]
+      }
+    },
+    "asp_net": {
+      "name": "ASP.NET",
+      "category": "programming_languages",
+      "website": "https://dotnet.microsoft.com",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "ASP.NET",
+          "X-AspNet-Version": ".*",
+          "X-AspNetMvc-Version": ".*",
+          "Set-Cookie": "ASP.NET_SessionId"
+        },
+        "html": [
+          "__VIEWSTATE",
+          "__EVENTVALIDATION",
+          "aspnetForm"
+        ]
+      }
+    },
+    "java": {
+      "name": "Java",
+      "category": "programming_languages",
+      "website": "https://java.com",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "JSP|Servlet|Java",
+          "Set-Cookie": "JSESSIONID"
+        },
+        "html": [
+          "\\.jsp[\"'\\s>?]",
+          "\\.jsf[\"'\\s>?]"
+        ]
+      }
+    },
+    "python": {
+      "name": "Python",
+      "category": "programming_languages",
+      "website": "https://python.org",
+      "detection": {
+        "headers": {
+          "Server": "Python|gunicorn|uvicorn|Werkzeug",
+          "X-Powered-By": "Python|Flask|Django"
+        }
+      }
+    },
+    "ruby": {
+      "name": "Ruby",
+      "category": "programming_languages",
+      "website": "https://ruby-lang.org",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "Phusion Passenger|Ruby",
+          "Server": "Phusion Passenger|Puma|Unicorn|Thin",
+          "Set-Cookie": "_.*_session"
+        }
+      }
+    },
+    "nodejs": {
+      "name": "Node.js",
+      "category": "programming_languages",
+      "website": "https://nodejs.org",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "Express|Next.js|Nuxt|Koa",
+          "Set-Cookie": "connect.sid"
+        }
+      }
+    },
+    "react": {
+      "name": "React",
+      "category": "javascript_frameworks",
+      "website": "https://reactjs.org",
+      "detection": {
+        "html": [
+          "data-reactroot",
+          "data-reactid",
+          "__NEXT_DATA__",
+          "_react",
+          "react\\.production\\.min\\.js",
+          "react-dom"
+        ],
+        "scripts": [
+          "react",
+          "react-dom",
+          "next"
+        ],
+        "meta": {
+          "generator": "Next.js"
+        }
+      }
+    },
+    "vue": {
+      "name": "Vue.js",
+      "category": "javascript_frameworks",
+      "website": "https://vuejs.org",
+      "detection": {
+        "html": [
+          "data-v-[a-f0-9]",
+          "__NUXT__",
+          "v-cloak",
+          "vue\\.runtime",
+          "vue\\.min\\.js"
+        ],
+        "scripts": [
+          "vue",
+          "nuxt"
+        ],
+        "meta": {
+          "generator": "Nuxt"
+        }
+      }
+    },
+    "angular": {
+      "name": "Angular",
+      "category": "javascript_frameworks",
+      "website": "https://angular.io",
+      "detection": {
+        "html": [
+          "ng-version",
+          "ng-app",
+          "ng-controller",
+          "ng-model",
+          "_ngcontent",
+          "angular\\.min\\.js"
+        ],
+        "scripts": [
+          "angular",
+          "@angular"
+        ]
+      }
+    },
+    "svelte": {
+      "name": "Svelte",
+      "category": "javascript_frameworks",
+      "website": "https://svelte.dev",
+      "detection": {
+        "html": [
+          "svelte-[a-z0-9]",
+          "__sveltekit"
+        ],
+        "scripts": [
+          "svelte"
+        ]
+      }
+    },
+    "jquery": {
+      "name": "jQuery",
+      "category": "javascript_libraries",
+      "website": "https://jquery.com",
+      "detection": {
+        "html": [
+          "jquery[.-]\\d",
+          "jquery\\.min\\.js"
+        ],
+        "scripts": [
+          "jquery",
+          "code.jquery.com"
+        ]
+      }
+    },
+    "lodash": {
+      "name": "Lodash",
+      "category": "javascript_libraries",
+      "website": "https://lodash.com",
+      "detection": {
+        "scripts": [
+          "lodash"
+        ]
+      }
+    },
+    "moment": {
+      "name": "Moment.js",
+      "category": "javascript_libraries",
+      "website": "https://momentjs.com",
+      "detection": {
+        "scripts": [
+          "moment"
+        ]
+      }
+    },
+    "axios": {
+      "name": "Axios",
+      "category": "javascript_libraries",
+      "website": "https://axios-http.com",
+      "detection": {
+        "scripts": [
+          "axios"
+        ]
+      }
+    },
+    "bootstrap": {
+      "name": "Bootstrap",
+      "category": "css_frameworks",
+      "website": "https://getbootstrap.com",
+      "detection": {
+        "html": [
+          "bootstrap\\.min\\.css",
+          "bootstrap\\.min\\.js",
+          "class=\"[^\"]*\\b(container|row|col-[a-z]{2}-\\d+|btn-primary|navbar)\\b"
+        ],
+        "scripts": [
+          "bootstrap"
+        ]
+      }
+    },
+    "tailwind": {
+      "name": "Tailwind CSS",
+      "category": "css_frameworks",
+      "website": "https://tailwindcss.com",
+      "detection": {
+        "html": [
+          "tailwind",
+          "class=\"[^\"]*\\b(flex|grid|bg-[a-z]+-\\d+|text-[a-z]+-\\d+|p-\\d|m-\\d|rounded-[a-z]+)\\b"
+        ]
+      }
+    },
+    "bulma": {
+      "name": "Bulma",
+      "category": "css_frameworks",
+      "website": "https://bulma.io",
+      "detection": {
+        "html": [
+          "bulma\\.min\\.css",
+          "class=\"[^\"]*\\b(is-primary|is-info|is-success|columns|column)\\b"
+        ]
+      }
+    },
+    "foundation": {
+      "name": "Foundation",
+      "category": "css_frameworks",
+      "website": "https://get.foundation",
+      "detection": {
+        "html": [
+          "foundation\\.min\\.css",
+          "class=\"[^\"]*\\b(small-\\d+|medium-\\d+|large-\\d+|cell|grid-x)\\b"
+        ]
+      }
+    },
+    "materialize": {
+      "name": "Materialize",
+      "category": "css_frameworks",
+      "website": "https://materializecss.com",
+      "detection": {
+        "html": [
+          "materialize\\.min\\.css",
+          "materialize\\.min\\.js"
+        ]
+      }
+    },
+    "wordpress": {
+      "name": "WordPress",
+      "category": "cms",
+      "website": "https://wordpress.org",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "WordPress",
+          "Link": "wp-json"
+        },
+        "html": [
+          "wp-content",
+          "wp-includes",
+          "wp-json",
+          "/xmlrpc\\.php"
+        ],
+        "meta": {
+          "generator": "WordPress"
+        }
+      }
+    },
+    "drupal": {
+      "name": "Drupal",
+      "category": "cms",
+      "website": "https://drupal.org",
+      "detection": {
+        "headers": {
+          "X-Generator": "Drupal",
+          "X-Drupal-Cache": ".*",
+          "X-Drupal-Dynamic-Cache": ".*"
+        },
+        "html": [
+          "Drupal\\.settings",
+          "/sites/default/files",
+          "drupal\\.js"
+        ],
+        "meta": {
+          "generator": "Drupal"
+        }
+      }
+    },
+    "joomla": {
+      "name": "Joomla",
+      "category": "cms",
+      "website": "https://joomla.org",
+      "detection": {
+        "html": [
+          "/media/jui/",
+          "/media/system/",
+          "Joomla!"
+        ],
+        "meta": {
+          "generator": "Joomla"
+        }
+      }
+    },
+    "ghost": {
+      "name": "Ghost",
+      "category": "cms",
+      "website": "https://ghost.org",
+      "detection": {
+        "headers": {
+          "X-Ghost-Cache-Status": ".*"
+        },
+        "html": [
+          "ghost-[a-z]+",
+          "/ghost/api/"
+        ],
+        "meta": {
+          "generator": "Ghost"
+        }
+      }
+    },
+    "shopify": {
+      "name": "Shopify",
+      "category": "ecommerce",
+      "website": "https://shopify.com",
+      "detection": {
+        "headers": {
+          "X-ShopId": ".*",
+          "X-Shopify-Stage": ".*"
+        },
+        "html": [
+          "cdn\\.shopify\\.com",
+          "Shopify\\.theme",
+          "shopify-section"
+        ],
+        "meta": {
+          "generator": "Shopify"
+        }
+      }
+    },
+    "magento": {
+      "name": "Magento",
+      "category": "ecommerce",
+      "website": "https://magento.com",
+      "detection": {
+        "headers": {
+          "Set-Cookie": "frontend=|MAGE_"
+        },
+        "html": [
+          "Mage\\.Cookies",
+          "/static/frontend/",
+          "mage/cookies"
+        ]
+      }
+    },
+    "woocommerce": {
+      "name": "WooCommerce",
+      "category": "ecommerce",
+      "website": "https://woocommerce.com",
+      "detection": {
+        "html": [
+          "woocommerce",
+          "wc-add-to-cart",
+          "/wc-api/"
+        ]
+      }
+    },
+    "prestashop": {
+      "name": "PrestaShop",
+      "category": "ecommerce",
+      "website": "https://prestashop.com",
+      "detection": {
+        "headers": {
+          "Set-Cookie": "PrestaShop"
+        },
+        "html": [
+          "prestashop",
+          "/modules/ps_"
+        ],
+        "meta": {
+          "generator": "PrestaShop"
+        }
+      }
+    },
+    "cloudflare": {
+      "name": "Cloudflare",
+      "category": "cdn",
+      "website": "https://cloudflare.com",
+      "detection": {
+        "headers": {
+          "CF-RAY": ".*",
+          "CF-Cache-Status": ".*",
+          "Server": "cloudflare",
+          "Set-Cookie": "__cf"
+        }
+      }
+    },
+    "fastly": {
+      "name": "Fastly",
+      "category": "cdn",
+      "website": "https://fastly.com",
+      "detection": {
+        "headers": {
+          "X-Served-By": "cache-",
+          "X-Cache": ".*",
+          "Via": ".*varnish.*",
+          "X-Fastly-Request-ID": ".*"
+        }
+      }
+    },
+    "akamai": {
+      "name": "Akamai",
+      "category": "cdn",
+      "website": "https://akamai.com",
+      "detection": {
+        "headers": {
+          "X-Akamai-Transformed": ".*",
+          "Server": "AkamaiGHost"
+        }
+      }
+    },
+    "cloudfront": {
+      "name": "Amazon CloudFront",
+      "category": "cdn",
+      "website": "https://aws.amazon.com/cloudfront",
+      "detection": {
+        "headers": {
+          "X-Amz-Cf-Id": ".*",
+          "X-Amz-Cf-Pop": ".*",
+          "Via": ".*cloudfront.*"
+        }
+      }
+    },
+    "google_analytics": {
+      "name": "Google Analytics",
+      "category": "analytics",
+      "website": "https://analytics.google.com",
+      "detection": {
+        "html": [
+          "google-analytics\\.com/analytics\\.js",
+          "googletagmanager\\.com",
+          "gtag\\(",
+          "_ga=",
+          "UA-\\d+-\\d+",
+          "G-[A-Z0-9]+"
+        ]
+      }
+    },
+    "google_tag_manager": {
+      "name": "Google Tag Manager",
+      "category": "analytics",
+      "website": "https://tagmanager.google.com",
+      "detection": {
+        "html": [
+          "googletagmanager\\.com/gtm\\.js",
+          "GTM-[A-Z0-9]+"
+        ]
+      }
+    },
+    "hotjar": {
+      "name": "Hotjar",
+      "category": "analytics",
+      "website": "https://hotjar.com",
+      "detection": {
+        "html": [
+          "static\\.hotjar\\.com",
+          "hotjar\\.com/c/hotjar"
+        ]
+      }
+    },
+    "mixpanel": {
+      "name": "Mixpanel",
+      "category": "analytics",
+      "website": "https://mixpanel.com",
+      "detection": {
+        "html": [
+          "cdn\\.mxpnl\\.com",
+          "mixpanel"
+        ]
+      }
+    },
+    "segment": {
+      "name": "Segment",
+      "category": "analytics",
+      "website": "https://segment.com",
+      "detection": {
+        "html": [
+          "cdn\\.segment\\.com",
+          "analytics\\.js"
+        ]
+      }
+    },
+    "cloudflare_waf": {
+      "name": "Cloudflare WAF",
+      "category": "security",
+      "website": "https://cloudflare.com/waf",
+      "detection": {
+        "headers": {
+          "CF-RAY": ".*",
+          "Server": "cloudflare"
+        }
+      }
+    },
+    "modsecurity": {
+      "name": "ModSecurity",
+      "category": "security",
+      "website": "https://modsecurity.org",
+      "detection": {
+        "headers": {
+          "Server": "ModSecurity"
+        }
+      }
+    },
+    "sucuri": {
+      "name": "Sucuri",
+      "category": "security",
+      "website": "https://sucuri.net",
+      "detection": {
+        "headers": {
+          "X-Sucuri-ID": ".*",
+          "Server": "Sucuri"
+        }
+      }
+    },
+    "imperva": {
+      "name": "Imperva Incapsula",
+      "category": "security",
+      "website": "https://imperva.com",
+      "detection": {
+        "headers": {
+          "X-Iinfo": ".*",
+          "X-CDN": "Imperva"
+        },
+        "html": [
+          "incapsula"
+        ]
+      }
+    },
+    "varnish": {
+      "name": "Varnish",
+      "category": "caching",
+      "website": "https://varnish-cache.org",
+      "detection": {
+        "headers": {
+          "Via": ".*varnish.*",
+          "X-Varnish": ".*",
+          "X-Cache": ".*"
+        }
+      }
+    },
+    "redis": {
+      "name": "Redis",
+      "category": "caching",
+      "website": "https://redis.io",
+      "detection": {
+        "headers": {
+          "X-Redis-.*": ".*"
+        }
+      }
+    },
+    "mysql": {
+      "name": "MySQL",
+      "category": "databases",
+      "website": "https://mysql.com",
+      "detection": {
+        "html": [
+          "mysql_",
+          "mysqli_"
+        ]
+      }
+    },
+    "postgresql": {
+      "name": "PostgreSQL",
+      "category": "databases",
+      "website": "https://postgresql.org",
+      "detection": {
+        "html": [
+          "pg_",
+          "pgsql"
+        ]
+      }
+    },
+    "mongodb": {
+      "name": "MongoDB",
+      "category": "databases",
+      "website": "https://mongodb.com",
+      "detection": {
+        "html": [
+          "mongodb",
+          "ObjectId\\("
+        ]
+      }
+    },
+    "aws": {
+      "name": "Amazon Web Services",
+      "category": "hosting",
+      "website": "https://aws.amazon.com",
+      "detection": {
+        "headers": {
+          "X-Amz-.*": ".*",
+          "Server": "AmazonS3"
+        },
+        "html": [
+          "s3\\.amazonaws\\.com",
+          "s3-[a-z]+-[a-z]+-\\d+\\.amazonaws\\.com"
+        ]
+      }
+    },
+    "google_cloud": {
+      "name": "Google Cloud Platform",
+      "category": "hosting",
+      "website": "https://cloud.google.com",
+      "detection": {
+        "headers": {
+          "Via": ".*google.*",
+          "Server": "Google Frontend"
+        },
+        "html": [
+          "storage\\.googleapis\\.com"
+        ]
+      }
+    },
+    "azure": {
+      "name": "Microsoft Azure",
+      "category": "hosting",
+      "website": "https://azure.microsoft.com",
+      "detection": {
+        "headers": {
+          "X-Azure-.*": ".*"
+        },
+        "html": [
+          "blob\\.core\\.windows\\.net",
+          "azurewebsites\\.net"
+        ]
+      }
+    },
+    "heroku": {
+      "name": "Heroku",
+      "category": "hosting",
+      "website": "https://heroku.com",
+      "detection": {
+        "headers": {
+          "Via": ".*vegur.*",
+          "Server": "Cowboy"
+        }
+      }
+    },
+    "vercel": {
+      "name": "Vercel",
+      "category": "hosting",
+      "website": "https://vercel.com",
+      "detection": {
+        "headers": {
+          "X-Vercel-Id": ".*",
+          "X-Vercel-Cache": ".*",
+          "X-Vercel-Challenge-Token": ".*",
+          "Server": "Vercel"
+        },
+        "html": [
+          "vercel\\.com",
+          "_vercel"
+        ]
+      }
+    },
+    "vercel_protection": {
+      "name": "Vercel Bot Protection",
+      "category": "security",
+      "website": "https://vercel.com/docs/security",
+      "detection": {
+        "headers": {
+          "X-Vercel-Challenge-Token": ".*",
+          "x-vercel-mitigated": ".*"
+        }
+      }
+    },
+    "netlify": {
+      "name": "Netlify",
+      "category": "hosting",
+      "website": "https://netlify.com",
+      "detection": {
+        "headers": {
+          "X-NF-Request-ID": ".*",
+          "Server": "Netlify"
+        }
+      }
+    },
+    "recaptcha": {
+      "name": "reCAPTCHA",
+      "category": "widgets",
+      "website": "https://google.com/recaptcha",
+      "detection": {
+        "html": [
+          "google\\.com/recaptcha",
+          "g-recaptcha",
+          "grecaptcha"
+        ]
+      }
+    },
+    "hcaptcha": {
+      "name": "hCaptcha",
+      "category": "widgets",
+      "website": "https://hcaptcha.com",
+      "detection": {
+        "html": [
+          "hcaptcha\\.com",
+          "h-captcha"
+        ]
+      }
+    },
+    "intercom": {
+      "name": "Intercom",
+      "category": "widgets",
+      "website": "https://intercom.com",
+      "detection": {
+        "html": [
+          "intercom\\.io",
+          "intercomSettings"
+        ]
+      }
+    },
+    "zendesk": {
+      "name": "Zendesk",
+      "category": "widgets",
+      "website": "https://zendesk.com",
+      "detection": {
+        "html": [
+          "static\\.zdassets\\.com",
+          "zendesk"
+        ]
+      }
+    },
+    "crisp": {
+      "name": "Crisp",
+      "category": "widgets",
+      "website": "https://crisp.chat",
+      "detection": {
+        "html": [
+          "client\\.crisp\\.chat",
+          "CRISP_WEBSITE_ID"
+        ]
+      }
+    },
+    "stripe": {
+      "name": "Stripe",
+      "category": "widgets",
+      "website": "https://stripe.com",
+      "detection": {
+        "html": [
+          "js\\.stripe\\.com",
+          "Stripe\\("
+        ]
+      }
+    },
+    "paypal": {
+      "name": "PayPal",
+      "category": "widgets",
+      "website": "https://paypal.com",
+      "detection": {
+        "html": [
+          "paypal\\.com/sdk",
+          "paypalobjects\\.com"
+        ]
+      }
+    },
+    "font_awesome": {
+      "name": "Font Awesome",
+      "category": "css_frameworks",
+      "website": "https://fontawesome.com",
+      "detection": {
+        "html": [
+          "font-awesome",
+          "fontawesome",
+          "fa fa-",
+          "fas fa-",
+          "fab fa-"
+        ]
+      }
+    },
+    "google_fonts": {
+      "name": "Google Fonts",
+      "category": "css_frameworks",
+      "website": "https://fonts.google.com",
+      "detection": {
+        "html": [
+          "fonts\\.googleapis\\.com",
+          "fonts\\.gstatic\\.com"
+        ]
+      }
+    },
+    "webpack": {
+      "name": "Webpack",
+      "category": "javascript_libraries",
+      "website": "https://webpack.js.org",
+      "detection": {
+        "html": [
+          "webpackJsonp",
+          "__webpack_require__"
+        ]
+      }
+    },
+    "nginx_plus": {
+      "name": "NGINX Plus",
+      "category": "web_servers",
+      "website": "https://nginx.com",
+      "detection": {
+        "headers": {
+          "Server": "nginx-plus"
+        }
+      }
+    },
+    "laravel": {
+      "name": "Laravel",
+      "category": "programming_languages",
+      "website": "https://laravel.com",
+      "detection": {
+        "headers": {
+          "Set-Cookie": "laravel_session"
+        },
+        "html": [
+          "laravel",
+          "_token.*csrf"
+        ]
+      }
+    },
+    "django": {
+      "name": "Django",
+      "category": "programming_languages",
+      "website": "https://djangoproject.com",
+      "detection": {
+        "headers": {
+          "Set-Cookie": "csrftoken.*",
+          "X-Frame-Options": "SAMEORIGIN"
+        },
+        "html": [
+          "csrfmiddlewaretoken",
+          "__admin_media_prefix__"
+        ]
+      }
+    },
+    "flask": {
+      "name": "Flask",
+      "category": "programming_languages",
+      "website": "https://flask.palletsprojects.com",
+      "detection": {
+        "headers": {
+          "Server": "Werkzeug"
+        }
+      }
+    },
+    "rails": {
+      "name": "Ruby on Rails",
+      "category": "programming_languages",
+      "website": "https://rubyonrails.org",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "Phusion Passenger",
+          "Set-Cookie": "_.*_session"
+        },
+        "html": [
+          "csrf-token",
+          "authenticity_token",
+          "rails-ujs"
+        ],
+        "meta": {
+          "csrf-token": ".*"
+        }
+      }
+    },
+    "spring": {
+      "name": "Spring",
+      "category": "programming_languages",
+      "website": "https://spring.io",
+      "detection": {
+        "headers": {
+          "Set-Cookie": "JSESSIONID"
+        },
+        "html": [
+          "spring",
+          "_csrf"
+        ]
+      }
+    },
+    "express": {
+      "name": "Express",
+      "category": "programming_languages",
+      "website": "https://expressjs.com",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "Express"
+        }
+      }
+    },
+    "nextjs": {
+      "name": "Next.js",
+      "category": "javascript_frameworks",
+      "website": "https://nextjs.org",
+      "detection": {
+        "headers": {
+          "X-Powered-By": "Next.js"
+        },
+        "html": [
+          "__NEXT_DATA__",
+          "_next/static"
+        ]
+      }
+    },
+    "nuxtjs": {
+      "name": "Nuxt.js",
+      "category": "javascript_frameworks",
+      "website": "https://nuxtjs.org",
+      "detection": {
+        "html": [
+          "__NUXT__",
+          "_nuxt/"
+        ]
+      }
+    },
+    "gatsby": {
+      "name": "Gatsby",
+      "category": "javascript_frameworks",
+      "website": "https://gatsbyjs.com",
+      "detection": {
+        "html": [
+          "gatsby",
+          "___gatsby"
+        ],
+        "meta": {
+          "generator": "Gatsby"
+        }
+      }
+    },
+    "ember": {
+      "name": "Ember.js",
+      "category": "javascript_frameworks",
+      "website": "https://emberjs.com",
+      "detection": {
+        "html": [
+          "ember-view",
+          "data-ember",
+          "ember\\.js"
+        ]
+      }
+    },
+    "backbone": {
+      "name": "Backbone.js",
+      "category": "javascript_frameworks",
+      "website": "https://backbonejs.org",
+      "detection": {
+        "scripts": [
+          "backbone"
+        ]
+      }
+    },
+    "alpine": {
+      "name": "Alpine.js",
+      "category": "javascript_frameworks",
+      "website": "https://alpinejs.dev",
+      "detection": {
+        "html": [
+          "x-data",
+          "x-init",
+          "x-show",
+          "x-bind"
+        ]
+      }
+    },
+    "htmx": {
+      "name": "htmx",
+      "category": "javascript_frameworks",
+      "website": "https://htmx.org",
+      "detection": {
+        "html": [
+          "hx-get",
+          "hx-post",
+          "hx-trigger",
+          "htmx\\.org"
+        ]
+      }
+    }
+  },
+  "favicon_hashes": {
+    "116323821": "Spring",
+    "-297069493": "Jenkins",
+    "81586312": "Apache Tomcat",
+    "-656811182": "Atlassian",
+    "442749392": "nginx",
+    "-1137990221": "Laravel",
+    "1485257654": "WordPress",
+    "-1917210982": "Grafana",
+    "1354868867": "Kibana"
+  }
+}
